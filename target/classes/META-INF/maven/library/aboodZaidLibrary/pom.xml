@@ -4,22 +4,9 @@
   <artifactId>aboodZaidLibrary</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Library</name>
-    <properties>
-  <maven.compiler.source>1.8</maven.compiler.source>
-  <maven.complier.target>1.8</maven.complier.target>
-  </properties>
-  <dependencies>
-<!-- https://mvnrepository.com/artifact/com.github.wookietreiber/scala-chart -->
-<dependency>
-    <groupId>com.github.wookietreiber</groupId>
-    <artifactId>scala-chart_2.12</artifactId>
-    <version>0.5.1</version>
-</dependency>
-  </dependencies>
-  <build>
-   <plugins>
   
-  </plugins>
-  </build>
-
+  
+  
+  <dependencies>
+  </dependencies>
 </project>
