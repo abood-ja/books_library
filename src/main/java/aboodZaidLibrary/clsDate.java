@@ -15,7 +15,11 @@ public class clsDate {
         _Month = today.getMonthValue();
         _Year = today.getYear();
     }
-
+    public clsDate(clsDate date) {
+        this._Day = date._Day;
+        this._Month = date._Month;
+        this._Year = date._Year;
+    }
     public clsDate(String sDate) {
         String[] vDate = sDate.split("/");
         _Day = Integer.parseInt(vDate[0]);
@@ -56,49 +60,73 @@ public class clsDate {
     public static boolean isLeapYear(int year) {
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
+    public static clsDate getSystemDate() {
+        java.time.LocalDate now = java.time.LocalDate.now();
+
+        int day = now.getDayOfMonth();
+        int month = now.getMonthValue();
+        int year = now.getYear();
+
+        return new clsDate(day, month, year);
+    }
+    
+    
+    public static String getSystemDateTimeString() {
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+        int day = now.getDayOfMonth();
+        int month = now.getMonthValue();
+        int year = now.getYear();
+        int hour = now.getHour();
+        int minute = now.getMinute();
+        int second = now.getSecond();
+
+        return String.format("%02d/%02d/%04d - %02d:%02d:%02d",
+                             day, month, year, hour, minute, second);
+    }
 
     public boolean isLeapYear() {
         return isLeapYear(_Year);
     }
-    static int NumberOfDaysInAYear(int year)
+    public static int numberOfDaysInAYear(int year)
 	{
 		return  isLeapYear(year) ? 365 : 364;
 	}
 
-	int NumberOfDaysInAYear()
+    public int numberOfDaysInAYear()
 	{
-		return  NumberOfDaysInAYear(_Year);
+		return  numberOfDaysInAYear(_Year);
 	}
-	static int NumberOfHoursInAYear(int year)
+	public static int numberOfHoursInAYear(int year)
 	{
-		return  NumberOfDaysInAYear(year) * 24;
-	}
-
-	int NumberOfHoursInAYear()
-	{
-		return  NumberOfHoursInAYear(_Year);
-	}
-	static int NumberOfMinutesInAYear(int year)
-	{
-		return  NumberOfHoursInAYear(year) * 60;
+		return  numberOfDaysInAYear(year) * 24;
 	}
 
-	int NumberOfMinutesInAYear()
+	public int NumberOfHoursInAYear()
 	{
-		return  NumberOfMinutesInAYear(_Year);
+		return  numberOfHoursInAYear(_Year);
+	}
+	public static int numberOfMinutesInAYear(int year)
+	{
+		return  numberOfHoursInAYear(year) * 60;
+	}
+
+	public int numberOfMinutesInAYear()
+	{
+		return  numberOfMinutesInAYear(_Year);
 	}
 	
-	static int NumberOfSecondsInAYear(int year)
+	public static int numberOfSecondsInAYear(int year)
 	{
-		return  NumberOfMinutesInAYear(year) * 60;
+		return  numberOfMinutesInAYear(year) * 60;
 	}
 	
-	int NumberOfSecondsInAYear()
+	public int numberOfSecondsInAYear()
 	{
-		return  NumberOfSecondsInAYear();
+		return  numberOfSecondsInAYear();
 	}
 	
-	static int numberOfDaysInAMonth(int month, int year)
+	public static int numberOfDaysInAMonth(int month, int year)
 	{
 
 		if (month < 1 || month>12)
@@ -109,43 +137,43 @@ public class clsDate {
 
 	}
 
-	int numberOfDaysInAMonth()
+	public int numberOfDaysInAMonth()
 	{
 		return numberOfDaysInAMonth(_Month, _Year);
 	}
    
 	
-	static int numberOfHoursInAMonth(int month, int year)
+	public static int numberOfHoursInAMonth(int month, int year)
 	{
 		return  numberOfDaysInAMonth(month, year) * 24;
 	}
 
-	int numberOfHoursInAMonth()
+	public int numberOfHoursInAMonth()
 	{
 		return  numberOfDaysInAMonth(_Month, _Year) * 24;
 	}
 	
-	static int numberOfMinutesInAMonth(int month, int year)
+	public static int numberOfMinutesInAMonth(int month, int year)
 	{
 		return  numberOfHoursInAMonth(month, year) * 60;
 	}
 
-	int numberOfMinutesInAMonth()
+	public int numberOfMinutesInAMonth()
 	{
 		return  numberOfHoursInAMonth(_Month, _Year) * 60;
 	}
 	
-	static int numberOfSecondsInAMonth(int month, int year)
+	public static int numberOfSecondsInAMonth(int month, int year)
 	{
 		return  numberOfMinutesInAMonth(month, year) * 60;
 	}
 
-	int NumberOfSecondsInAMonth()
+	public int NumberOfSecondsInAMonth()
 	{
 		return  numberOfMinutesInAMonth(_Month, _Year) * 60;
 	}
 	
-	static int dayOfWeekOrder(int day, int month, int year)
+	public static int dayOfWeekOrder(int day, int month, int year)
 	{
 		int a, y, m;
 		a = (14 - month) / 12;
@@ -155,12 +183,12 @@ public class clsDate {
 		return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
 	}
 
-	int dayOfWeekOrder()
+	public int dayOfWeekOrder()
 	{
 		return dayOfWeekOrder(_Day, _Month, _Year);
 	}
 	
-	static String dayShortName(int dayOfWeekOrder)
+	public static String dayShortName(int dayOfWeekOrder)
 	{
 		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
@@ -168,7 +196,7 @@ public class clsDate {
 
 	}
 
-	static String dayShortName(int day, int month, int year)
+	public static String dayShortName(int day, int month, int year)
 	{
 
 		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
@@ -177,7 +205,7 @@ public class clsDate {
 
 	}
 
-	String dayShortName()
+	public String dayShortName()
 	{
 
 		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
@@ -185,7 +213,7 @@ public class clsDate {
 
 	}
 	
-	static String monthShortName(int monthNumber)
+	public static String monthShortName(int monthNumber)
 	{
 		String months[] = { "Jan", "Feb", "Mar",
 						   "Apr", "May", "Jun",
@@ -196,7 +224,7 @@ public class clsDate {
 		return (months[monthNumber - 1]);
 	}
 
-	String monthShortName()
+	public String monthShortName()
 	{
 
 		return monthShortName(_Month);
@@ -230,12 +258,12 @@ public class clsDate {
     }
 	
 	
-	void printMonthCalendar()
+	public void printMonthCalendar()
 	{
 		printMonthCalendar(_Month, _Year);
 	}
 	
-	static void printYearCalendar(int year) {
+	public static void printYearCalendar(int year) {
         System.out.println("\n  _________________________________\n");
         System.out.printf("           Calendar - %d\n", year);
         System.out.println("  _________________________________\n");
@@ -351,47 +379,39 @@ public class clsDate {
 	            : false) 
 	        : false;
 	}
-
 	public boolean isDateEqualDate2(clsDate date2) {
 	    return isDate1EqualDate2(this, date2);
 	}
 	
-	public static boolean isLastDayInMonth(clsDate date) {
-	    return (date.getDay() == numberOfDaysInAMonth(date.getMonth(), date.getYear()));
-	}
+	public static int getDifferenceInDays(clsDate date1, clsDate date2) {
+	    
+	    clsDate d1 = new clsDate(date1);
+	    clsDate d2 = new clsDate(date2);
 
-	public boolean isLastDayInMonth() {
-	    return isLastDayInMonth(this);
-	}
-	
-	static boolean isLastMonthInYear(int month)
-	{
-		return (month == 12);
-	}
+	    int days = 0;
+	    int swapFlag = 1;
 
-	public static clsDate addOneDay(clsDate date) {
-	    if (isLastDayInMonth(date)) {
-	        if (isLastMonthInYear(date.getMonth())) {
-	            date.setMonth(1);
-	            date.setDay(1);
-	            date.setYear(date.getYear() + 1);
-	        } else {
-	            date.setDay(1);
-	            date.setMonth(date.getMonth() + 1);
-	        }
-	    } else {
-	        date.setDay(date.getDay() + 1);
+	    if (!clsDate.isDate1BeforeDate2(d1, d2)) {
+	        clsDate temp = d1;
+	        d1 = d2;
+	        d2 = temp;
+	        swapFlag = -1;
 	    }
 
-	    return date;
+	    // Count days
+	    while (clsDate.isDate1BeforeDate2(d1, d2)) {
+	        d1.addDays(1);
+	        days++;
+	    }
+
+	 
+	    return days * swapFlag;
 	}
 	
-	public void addOneDay() {
-		    clsDate updatedDate = addOneDay(this); 
-		    this.setDay(updatedDate.getDay());     
-		    this.setMonth(updatedDate.getMonth()); 
-		    this.setYear(updatedDate.getYear());   
+	public int getDifferenceInDays(clsDate date2)
+	{
+		return getDifferenceInDays(this, date2);
 	}
-	
 
 }
+	
