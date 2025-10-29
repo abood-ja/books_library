@@ -102,7 +102,7 @@ public class clsDate {
 		return  numberOfDaysInAYear(year) * 24;
 	}
 
-	public int NumberOfHoursInAYear()
+	public int numberOfHoursInAYear()
 	{
 		return  numberOfHoursInAYear(_Year);
 	}
@@ -123,7 +123,7 @@ public class clsDate {
 	
 	public int numberOfSecondsInAYear()
 	{
-		return  numberOfSecondsInAYear();
+		return  numberOfSecondsInAYear(_Year);
 	}
 	
 	public static int numberOfDaysInAMonth(int month, int year)
@@ -168,7 +168,7 @@ public class clsDate {
 		return  numberOfMinutesInAMonth(month, year) * 60;
 	}
 
-	public int NumberOfSecondsInAMonth()
+	public int numberOfSecondsInAMonth()
 	{
 		return  numberOfMinutesInAMonth(_Month, _Year) * 60;
 	}
