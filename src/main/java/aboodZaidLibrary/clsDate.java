@@ -90,7 +90,7 @@ public class clsDate {
     }
     public static int numberOfDaysInAYear(int year)
 	{
-		return  isLeapYear(year) ? 365 : 364;
+		return  isLeapYear(year) ? 366 : 365;
 	}
 
     public int numberOfDaysInAYear()
@@ -202,7 +202,6 @@ public class clsDate {
 		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
 		return arrDayNames[dayOfWeekOrder(day, month, year)];
-
 	}
 
 	public String dayShortName()
@@ -229,9 +228,6 @@ public class clsDate {
 
 		return monthShortName(_Month);
 	}
-	
-	
-	
 	
 	public static void printMonthCalendar(int month, int year) {
         int numberOfDays;
@@ -412,6 +408,8 @@ public class clsDate {
 	{
 		return getDifferenceInDays(this, date2);
 	}
+	
+	
 
 }
 	
