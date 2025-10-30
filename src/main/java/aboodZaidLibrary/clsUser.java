@@ -8,9 +8,11 @@ public class clsUser extends clsPerson{
 	    UpdateMode(1),
 	    AddNewMode(2);
 	    private final int value;
+
 	    enMode(int value) {
 	        this.value = value;
 	    }
+
 	    public int getValue() {
 	        return value;
 	    }
