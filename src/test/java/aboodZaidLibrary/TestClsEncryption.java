@@ -36,6 +36,15 @@ class TestClsEncryption {
 		//Assert
 		assertEquals(string1,string2);
 	}
+	
+	@Test
+	void testEncryptText_InvalidEncryptionKey() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsEncryption.encryptText("1234", -1);
+        });
+		assertTrue(exception.getMessage().contains("Encryption key must not be negative."));
+	}
+	
 	@Test
 	void testDecryptText() {
 		//Arrange
@@ -46,6 +55,14 @@ class TestClsEncryption {
 		string2=clsEncryption.decryptText(string2, 1);
 		//Assert
 		assertEquals(string1,string2);
+	}
+	
+	@Test
+	void testDecryptText_InvalidEncryptionKey() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsEncryption.decryptText("1234", -1);
+        });
+		assertTrue(exception.getMessage().contains("Encryption key must not be negative."));
 	}
 
 }

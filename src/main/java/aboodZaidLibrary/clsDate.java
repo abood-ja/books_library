@@ -39,7 +39,7 @@ public class clsDate {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
         _Day = day;
         _Month = month;
@@ -55,7 +55,7 @@ public class clsDate {
              throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
          }
          if (year < 1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
     	
         _Day = day;
@@ -92,14 +92,14 @@ public class clsDate {
 
     public void setYear(int year) {
     	 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
         _Year = year;
     }
 
     public static boolean isLeapYear(int year) {
     	 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
@@ -133,7 +133,7 @@ public class clsDate {
     public static int numberOfDaysInAYear(int year)
 	{
     	 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
 		return  isLeapYear(year) ? 366 : 365;
 	}
@@ -145,7 +145,7 @@ public class clsDate {
 	public static int numberOfHoursInAYear(int year)
 	{
 		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
 		return  numberOfDaysInAYear(year) * 24;
 	}
@@ -157,7 +157,7 @@ public class clsDate {
 	public static int numberOfMinutesInAYear(int year)
 	{
 		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
 		return  numberOfHoursInAYear(year) * 60;
 	}
@@ -170,7 +170,7 @@ public class clsDate {
 	public static int numberOfSecondsInAYear(int year)
 	{
 		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
 		return  numberOfMinutesInAYear(year) * 60;
 	}
@@ -184,7 +184,9 @@ public class clsDate {
 	{
 
 		if (month < 1 || month>12)
-			return  0;
+			{
+			throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
+			}
 
 		int days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
 		return (month == 2) ? (isLeapYear(year) ? 29 : 28) : days[month - 1];
@@ -237,7 +239,7 @@ public class clsDate {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
 		int a, y, m;
 		a = (14 - month) / 12;
@@ -273,7 +275,7 @@ public class clsDate {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
 		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
@@ -316,7 +318,7 @@ public class clsDate {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
         // Index of the day from 0 to 6
         int current = dayOfWeekOrder(1, month, year);
@@ -347,7 +349,7 @@ public class clsDate {
 	
 	public static void printYearCalendar(int year) {
 		if (year < 1) {
-	       	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+	       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
 	        }
         System.out.println("\n  _________________________________\n");
         System.out.printf("           Calendar - %d\n", year);
@@ -376,7 +378,7 @@ public class clsDate {
              throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
          }
          if (year < 1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  1. Given: " + year);
+        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
          }
 	    int totalDays = 0;
 

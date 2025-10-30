@@ -42,6 +42,14 @@ static clsDate date;
 	}
 	
 	@Test
+	void testIsLeapYear_InValidYear() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.isLeapYear(0); 
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+	}
+	
+	@Test
 	void testGetSystemDate() {
 		//Arrange
 		LocalDate today = LocalDate.now();
@@ -58,8 +66,56 @@ static clsDate date;
         assertEquals(date.getYear(),myDate.getYear());
 	}
 	
+	@Test 
+	void testClsDateConstructor_DayMonthYear_InvalidDay() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(32, 3, 2021);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+	}
+	
+	@Test 
+	void testClsDateConstructor_DayMonthYear_InvalidMonth() {
+		 IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	            new clsDate(10, 13, 2021);
+	        });
+	        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+	}
+	
+	@Test 
+	void testClsDateConstructor_DayMonthYear_InvalidYear() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(10, 5, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+	}
+	
+	@Test 
+	void testClsDateConstructor_String_InvalidDay() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("32/2/2022");
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+	}
+	
+	@Test 
+	void testClsDateConstructor_String_InvalidMonth() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("2/13/2022");
+        });
+		assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+	}
+	
+	@Test 
+	void testClsDateConstructor_String_InvalidYear() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("2/8/-2022");
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than"));
+	}
+	
 	@Test
-	void testNumberOfDaysInLeapYear() {
+	void testNumberOfDaysInAYear_LeapYear() {
 	    // Arrange & Action
 	    int daysIn2000 = clsDate.numberOfDaysInAYear(2000);
 	    
@@ -68,7 +124,7 @@ static clsDate date;
 	}
 
 	@Test
-	void testNumberOfDaysInNonLeapYear() {
+	void testNumberOfDaysInAYear_NoneLeapYear() {
 	    // Arrange & Action
 	    int daysIn2001 = clsDate.numberOfDaysInAYear(2001);
 	    
@@ -77,7 +133,15 @@ static clsDate date;
 	}
 	
 	@Test
-	void testNumberOfHoursInLeapYear() {
+	void testNumberOfDaysInYear_InvalidYear() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAYear(0);
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+	}
+	
+	@Test
+	void testNumberOfHoursInAYear_LeapYear() {
 	    // Arrange & Action
 	    int hoursIn2000 = clsDate.numberOfHoursInAYear(2000);
 	    // Assert
@@ -85,11 +149,19 @@ static clsDate date;
 	}
 	
 	@Test
-	void testNumberOfHoursInNonLeapYear() {
+	void testNumberOfHoursInAYear_NoneLeapYear() {
 	    // Arrange & Action
 	    int hoursIn2001 = clsDate.numberOfHoursInAYear(2001);
 	    // Assert
 	    assertEquals(365 * 24, hoursIn2001);
+	}
+	
+	@Test
+	void testNumberOfHoursInAYear_InvalidYear() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAYear(0);
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test
@@ -103,7 +175,15 @@ static clsDate date;
 		//Assert
 		assertEquals(minutesIn2000,366*24*60);
 		assertEquals(minutesIn2001,365*24*60);
-		
+	}
+	
+	@Test
+	
+	void testNumberOfMinutesInAYear_InValidInput() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAYear(0);
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test 
@@ -117,6 +197,14 @@ static clsDate date;
 		//Assert
 		assertEquals(secondsIn2000,366*24*60*60);
 		assertEquals(secondsIn2001,365*24*60*60);
+	}
+	
+	@Test 
+	void testNumberOfSecondsInAYear_InvalidInput() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAYear(0);
+        });
+		assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test
@@ -138,6 +226,32 @@ static clsDate date;
 	}
 	
 	@Test
+	void testNumberOfDaysInAMonth_InvalidMonth() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAMonth(13, 2000);
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Month must be between"));
+	}
+	
+	void testNumberOfDaysInAMonth_InvalidYear() {
+        // Action & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAMonth(6, -200);  // valid month, invalid year
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Year must be bigger than  0"));
+    }
+	
+	
+	
+	
+	@Test
 	void testNumberOfHoursInAMonth_NonLeapYear(){
 		//Arrange
 	    int[] expected = {31*24,28*24,31*24,30*24,31*24,30*24,31*24,31*24,30*24,31*24,30*24,31*24};
@@ -155,6 +269,30 @@ static clsDate date;
 	    for (int month = 1; month <= 12; month++) {
 	        assertEquals(expected[month-1], clsDate.numberOfHoursInAMonth(month, 2000));
 	    }	
+	}
+	
+	@Test
+	void testNumberOfHoursInAMonth_InvalidMonth(){
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfHoursInAMonth(13, 2000); 
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Month must be between"));
+	}
+	
+	@Test
+	void testNumberOfHoursInAMonth_InvalidYear() {
+		// Action & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfHoursInAMonth(2, -200); // valid month, invalid year
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test 
@@ -177,6 +315,30 @@ static clsDate date;
 	    }
 	}
 	
+	@Test
+	void testNumberOfMinutesInAMonth_InvalidMonth() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.numberOfMinutesInAMonth(13,2000); 
+		        });
+
+		        
+		        assertTrue(
+		            exception.getMessage().contains("Month must be between"));
+	}
+	
+	@Test
+	void testNumberOfMinutesInAMonth_InvalidYear() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfMinutesInAMonth(2,-200); 
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Year must be bigger than  0"));
+	}
+	
 	@Test 
 	void testNumberOfSecondsInAMonth_NonLeapYear() {
 		//Arrange
@@ -195,6 +357,30 @@ static clsDate date;
 	    for (int month = 1; month <= 12; month++) {
 	        assertEquals(expected[month-1], clsDate.numberOfSecondsInAMonth(month, 2000));
 	    }	
+	}
+	
+	@Test
+	void testNumberOfSecondsInAMonth_InvalidMonth() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfSecondsInAMonth(13, 2000);
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Month must be between"));
+	}
+	
+	@Test
+	void testNumberOfSecondsInAMonth_InvalidYear() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.numberOfMinutesInAMonth(2,-200); 
+		        });
+
+		        
+		        assertTrue(
+		            exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test
@@ -220,6 +406,37 @@ static clsDate date;
 	}
 	 
 	@Test
+	void testDayOfWeekOrder_InvalidDay() {
+		 IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	            clsDate.dayOfWeekOrder(0, 1, 2021);
+	        });
+	        assertTrue(exception.getMessage().contains("Day must be between"));
+		}
+	
+	@Test
+	void testDayOfWeekOrder_InvalidMonth() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.dayOfWeekOrder(2, 13, 2000);
+		        });
+
+		        assertTrue(
+		            exception.getMessage().contains("Month must be between"));
+		}
+	
+	@Test
+	void testDayOfWeekOrder_InvalidYear() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(2, 2, -200); 
+        });
+
+        
+        assertTrue(
+            exception.getMessage().contains("Year must be bigger than  0"));
+		}
+	
+	@Test
 	void testDayShortName_DayOfWeekOrder() {
 		 //Arrange
 		String expected[]= { "Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
@@ -230,6 +447,14 @@ static clsDate date;
 	}
 	
 	@Test
+	void testDayShortName_DayOfWeekOrder_InvalidInput() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(-1);
+        });
+        assertTrue(exception.getMessage().contains("day must be from 0 to 6"));
+	}
+	
+	@Test
 	void testDayShortName_DayMonthYear() {
 		//Assert
      assertEquals("Thu", clsDate.dayShortName(30, 10, 2025));
@@ -237,6 +462,36 @@ static clsDate date;
      assertEquals("Fri", clsDate.dayShortName(15, 8, 1947));
      assertEquals("Mon", clsDate.dayShortName(6, 1, 2025));
      assertEquals("Sun", clsDate.dayShortName(3, 11, 2024));
+	}
+	
+	@Test
+	void testDayShortName_DayMonthYear_InvalidDay() {
+		  IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+	            clsDate.dayShortName(32, 1, 2021);  
+	        });
+	        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+	}
+	
+	@Test
+	void testDayShortName_DayMonthYear_InvalidMonth() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.dayShortName(2, 13, 2000);
+		        });
+
+		        assertTrue(
+		            exception.getMessage().contains("Month must be between"));
+	}
+	
+	@Test
+	void testDayShortName_DayMonthYear_InvalidYear() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.dayShortName(2, 12, -2000);
+		        });
+
+		        assertTrue(
+		            exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	@Test
@@ -252,6 +507,17 @@ static clsDate date;
 		}
 	}
 	
+	@Test
+	void testMonthShortName_InvalidInput() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.monthShortName(13);
+        });
+
+        assertTrue(
+            exception.getMessage().contains("Month must be between"));
+	}
+	
 	@Test 
     public void testDaysFromTheBeginningOfTheYear() {
 		assertEquals(1, clsDate.daysFromTheBeginningOfTheYear(1, 1, 2025)); // Jan 1
@@ -260,6 +526,36 @@ static clsDate date;
 	    assertEquals(61, clsDate.daysFromTheBeginningOfTheYear(1, 3, 2024)); // Leap year Feb
 	    assertEquals(366, clsDate.daysFromTheBeginningOfTheYear(31, 12, 2024)); // Leap year Dec 31
 	    assertEquals(365, clsDate.daysFromTheBeginningOfTheYear(31, 12, 2025)); // Non-leap Dec 31
+	}
+	
+	@Test
+	public void testDaysFromTheBeginningOfTheYear_InvalidDay() {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(33, 2, 2022);  
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+	}
+	
+	@Test
+	public void testDaysFromTheBeginningOfTheYear_InvalidMonth() {
+		//Action & Assert
+				IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		            clsDate.daysFromTheBeginningOfTheYear(3, 13, 2000);
+		        });
+
+		        assertTrue(
+		            exception.getMessage().contains("Month must be between"));
+	}
+	
+	@Test
+	public void testDaysFromTheBeginningOfTheYear_InvalidYear() {
+		//Action & Assert
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(2, 2, -200);
+        });
+
+        assertTrue(
+            exception.getMessage().contains("Year must be bigger than  0"));
 	}
 	
 	
