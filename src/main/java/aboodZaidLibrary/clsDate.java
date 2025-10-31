@@ -126,7 +126,13 @@ public class clsDate {
         return String.format("%02d/%02d/%04d - %02d:%02d:%02d",
                              day, month, year, hour, minute, second);
     }
-
+    public static String DateToString(clsDate date) {
+        return date.getDay() + "/" + date.getMonth() + "/" + date.getYear();
+    }
+    public String DateToString()
+    {
+    	return  DateToString(this);
+    }
     public boolean isLeapYear() {
         return isLeapYear(_Year);
     }

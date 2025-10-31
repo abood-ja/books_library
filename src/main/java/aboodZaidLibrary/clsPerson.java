@@ -35,4 +35,7 @@ public class clsPerson {
 	public String getPhone() {
 		return this._Phone;
 	}
+	public String getFullName() {
+		return this._FirstName +" " +this._LastName;
+	}
 }
