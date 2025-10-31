@@ -771,6 +771,18 @@ static clsDate date;
 	   //Assert
 	     assertEquals(clsDate.getDifferenceInDays(date1, date2),-365);
 	 }
+	 
+	 @Test
+	 void testDateToString() {
+		 //Arrange
+		 String dateString;
+		 date=new clsDate(10,12,2023);
+		 //Action 
+		 dateString=date.DateToString();
+		 //Assert
+		 assertEquals(dateString,"10/12/2023");
+		 
+	 }
 	
 	 
 }
