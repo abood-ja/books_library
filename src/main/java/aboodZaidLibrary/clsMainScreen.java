@@ -36,10 +36,14 @@ public class clsMainScreen extends clsScreen {
 	    return null;
 	}
 	private static  void _ShowBooksMenu() {
-		
+        System.out.print("\nBooks Menu Will be here...\n");
 	}
-	private static void _ShowManageUsersMenu() {}
-	private static void _ShowLoginRegisterScreen() {}
+	private static void _ShowManageUsersMenu() {
+        System.out.print("\nManage Users Menu Will be here...\n");
+    }
+	private static void _ShowLoginRegisterScreen() {
+        clsLoginRegisterScreen.showLoginRegisterScreen();
+    }
 	private static void _Logout() {
 		clsUserSession.currentUser=clsUser.find("","");
 	}
