@@ -36,7 +36,7 @@ public class clsMainScreen extends clsScreen {
 	    return null;
 	}
 	private static  void _ShowBooksMenu() {
-        System.out.print("\nBooks Menu Will be here...\n");
+        clsBooksMenuScreen.showBooksMenu();
 	}
 	private static void _ShowManageUsersMenu() {
         System.out.print("\nManage Users Menu Will be here...\n");
