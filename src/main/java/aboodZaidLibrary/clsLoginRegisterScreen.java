@@ -40,7 +40,6 @@ public class clsLoginRegisterScreen extends clsScreen{
         System.out.println(pad + "_______________________________________________________" +
                 "_________________________________________");
     }
-
     // Helper method to print one record line, aligned
     private static void printLoginRegisterRecordLine(clsUser.clsLoginRegisterRecord record, String pad) {
         System.out.println(pad + "| " +
