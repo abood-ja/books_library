@@ -120,7 +120,7 @@ public class clsBook {
     public String getISBN(){
         return _ISBN;
     }
-    public static clsBook findByTitle(String title) {
+    public static clsBook findBookByTitle(String title) {
         String fileName = "Books.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -135,7 +135,7 @@ public class clsBook {
         }
         return _GetEmptyBookObject();
     }
-    public static clsBook findByAuthor(String author) {
+    public static clsBook findBookByAuthor(String author) {
         String fileName = "Books.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -150,7 +150,7 @@ public class clsBook {
         }
         return _GetEmptyBookObject();
     }
-    public static clsBook findByISBN(String isbn) {
+    public static clsBook findBookByISBN(String isbn) {
         String fileName = "Books.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -164,6 +164,55 @@ public class clsBook {
             e.printStackTrace();
         }
         return _GetEmptyBookObject();
+    }
+    public static Vector<clsBook> findBooksByTitle(String title) {
+        Vector<clsBook> results = new Vector<>();
+        String fileName = "Books.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                clsBook book = _ConvertLineToBookObject(line);
+                if (book.getTitle().equals(title)) {
+                    results.add(book);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+    public static Vector<clsBook> findBooksByAuthor(String author) {
+        Vector<clsBook> results = new Vector<>();
+        String fileName = "Books.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                clsBook book = _ConvertLineToBookObject(line);
+                if (book.getAuthor().equals(author)) {
+                    results.add(book);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+    public static Vector<clsBook> findBooksByISBN(String isbn) {
+        Vector<clsBook> results = new Vector<>();
+        String fileName = "Books.txt";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                clsBook book = _ConvertLineToBookObject(line);
+                if (book.getISBN().equals(isbn)) {
+                    results.add(book);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return results;
     }
     public enum enSaveResults {
         svFaildEmptyObject(0),
@@ -207,7 +256,7 @@ public class clsBook {
         return enSaveResults.svFaildEmptyObject;
     }
     public static boolean isBookExist(String ispn) {
-        clsBook book = findByISBN(ispn);
+        clsBook book = findBookByISBN(ispn);
         return !book.isEmpty();
     }
     public static clsBook GetAddNewBookObject(String ispn) {

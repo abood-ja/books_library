@@ -23,7 +23,7 @@ public class clsDeleteBookScreen extends clsScreen{
             System.out.print("\nISPN is not found, enter another one: ");
             ispn=clsInputValidate.readString();
         }
-        clsBook book=clsBook.findByISBN(ispn);
+        clsBook book=clsBook.findBookByISBN(ispn);
         _PrintBook(book);
         System.out.print("\nAre you sure you want to delete this book y/n? ");
         char answer = 'n';
