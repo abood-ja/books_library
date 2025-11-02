@@ -10,7 +10,7 @@ public class clsScreen {
         System.out.println(pad + "       " + title); // title with small indent
 
         if (subTitle != null && !subTitle.isEmpty()) {
-            System.out.println(pad + "   " + subTitle); // subtitle aligned under title
+            System.out.println(pad + "       " + subTitle); //
         }
 
         System.out.println(pad + "______________________________________");
