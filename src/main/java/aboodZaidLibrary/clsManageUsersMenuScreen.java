@@ -37,10 +37,10 @@ public class clsManageUsersMenuScreen extends clsScreen{
         return null;
     }
     private static void _ShowUsersListScreen(){
-        System.out.print("\nUsers List Screen Will be here...\n");
+        clsUserListScreen.showUserListScreen();
     }
     private static void _ShowAddUsersListScreen(){
-       clsAddNewBookScreen.showAddNewBookScreen();
+       clsAddUserScreen.showAddUserScreen();
     }
     private static void _ShowFindUsersListScreen(){
         System.out.print("\nFind User Screen Will be here...\n");
