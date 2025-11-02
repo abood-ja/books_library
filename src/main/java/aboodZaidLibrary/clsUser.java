@@ -308,7 +308,7 @@ public class clsUser extends clsPerson{
 	{
 		return _LoadUsersDataFromFile();
 	}
-	public boolean Delete() {
+	public boolean delete() {
 	    Vector<clsUser> vUsers = _LoadUsersDataFromFile();
 
 	    for (clsUser user : vUsers) {

@@ -46,7 +46,7 @@ public class clsManageUsersMenuScreen extends clsScreen{
         clsFindUserScreen.showFindUserScreen();
     }
     private static void _ShowDeleteUsersListScreen(){
-        System.out.print("\nDelete User Screen Will be here...\n");
+        clsDeleteUserScreen.showDeleteUserScreen();
     }
     private static void _ShowLoginRegisterScreen() {
         clsLoginRegisterScreen.showLoginRegisterScreen();
