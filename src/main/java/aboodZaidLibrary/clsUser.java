@@ -158,13 +158,12 @@ public class clsUser extends clsPerson{
 }
 	public enum enPermissions {
 	    eAll(-1),
-	    pBooks(1),
-	    pAddNewBook(2),
-	    pDeleteBook(4),
-	    pUpdateBooks(8),
-	    pFindBook(16),
-	    pManageUsers(32),
-	    pShowLoginRegister(64);
+	    pAddNewBook(1),
+	    pDeleteBook(2),
+	    pUpdateBooks(4),
+	    pFindBook(8),
+	    pManageUsers(16),
+	    pShowLoginRegister(32);
 
 	    private final int value;
 

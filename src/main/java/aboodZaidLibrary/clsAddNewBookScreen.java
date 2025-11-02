@@ -1,13 +1,13 @@
 package aboodZaidLibrary;
 
 public class clsAddNewBookScreen extends  clsScreen{
-    private static void readBookInfo(clsBook book){
+    private static void _ReadBookInfo(clsBook book){
         System.out.print("\nPlease enter Book Title: ");
         book.setTitle(clsInputValidate.readString());
         System.out.print("\nPlease enter Book Author: ");
         book.setAuthor(clsInputValidate.readString());
     }
-    private static void printBook(clsBook book){
+    private static void _PrintBook(clsBook book){
         System.out.print("\nBook Details:");
         System.out.print("\n___________________");
         System.out.println("\nBook Title  : " + book.getTitle());
@@ -29,13 +29,13 @@ public class clsAddNewBookScreen extends  clsScreen{
             ispn=clsInputValidate.readString();
         }
         clsBook newBook=clsBook.GetAddNewBookObject(ispn);
-        readBookInfo(newBook);
+        _ReadBookInfo(newBook);
         clsBook.enSaveResults saveResult;
         saveResult=newBook.save();
         switch (saveResult){
             case svSucceeded:
                 System.out.print("\nBook Added successfully :-)\n");
-                printBook(newBook);
+                _PrintBook(newBook);
                 break;
             case svFaildEmptyObject:
                 System.out.print("\nError Book was not saved because it's empty");

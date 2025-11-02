@@ -42,4 +42,11 @@ public class clsInputValidate {
         String input = scanner.nextLine();
         return input;
     }
+    public static char readChar() {
+        String input = readString();
+        if (input.isEmpty()) {
+            return '\0';
+        }
+        return input.charAt(0);
+    }
 }

@@ -50,7 +50,7 @@ public class clsBooksMenuScreen extends clsScreen {
         clsAddNewBookScreen.showAddNewBookScreen();
     }
     private static void _ShowDeleteBookScreen() {
-        System.out.print("\nDelete Book Screen Will be here...\n");
+        clsDeleteBookScreen.showDeleteBookScreen();
     }
     private static void _GoBackToBooksMenu() {
         String pad = String.format("%37s", "");

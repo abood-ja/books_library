@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class clsBooksListScreen extends clsScreen {
 
-    private static void printBookRecordLine(clsBook book, String pad) {
+    private static void _PrintBookRecordLine(clsBook book, String pad) {
         System.out.println(pad + "| " +
                 String.format("%-35s", book.getTitle()) +
                 "| " + String.format("%-25s", book.getAuthor()) +
@@ -35,7 +35,7 @@ public class clsBooksListScreen extends clsScreen {
             System.out.println(pad + "  No Books Available In the System!");
         } else {
             for (clsBook book : vBooks) {
-                printBookRecordLine(book, pad);
+                _PrintBookRecordLine(book, pad);
             }
         }
 

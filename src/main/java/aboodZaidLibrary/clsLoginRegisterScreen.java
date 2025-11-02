@@ -22,12 +22,12 @@ public class clsLoginRegisterScreen extends clsScreen {
         String pad = String.format("%20s", "");
 
 
-        System.out.println(pad + "__________________________________________________________________________________________");
+        System.out.println(pad + "______________________________________________________________________________________________");
         System.out.println(pad + "| " + String.format("%-35s", "Date/Time") +
                 "| " + String.format("%-20s", "UserName") +
                 "| " + String.format("%-20s", "Password") +
                 "| " + String.format("%-10s", "Permissions"));
-        System.out.println(pad + "__________________________________________________________________________________________");
+        System.out.println(pad + "______________________________________________________________________________________________");
 
 
         if (vLoginRegisterRecords.isEmpty()) {
