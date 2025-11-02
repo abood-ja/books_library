@@ -47,7 +47,7 @@ public class clsBooksMenuScreen extends clsScreen {
         System.out.print("\nFind Book Screen Will be here...\n");
     }
     private static void _ShowAddBookScreen() {
-        System.out.print("\nAdd Book Screen Will be here...\n");
+        clsAddNewBookScreen.showAddNewBookScreen();
     }
     private static void _ShowDeleteBookScreen() {
         System.out.print("\nDelete Book Screen Will be here...\n");
