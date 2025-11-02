@@ -6,11 +6,6 @@ public class clsLoginRegisterScreen extends clsScreen {
 
     protected static void showLoginRegisterScreen() {
 
-        if (!CheckAccessRights(clsUser.enPermissions.pShowLoginRegister)) {
-            return;
-        }
-
-
         Vector<clsUser.clsLoginRegisterRecord> vLoginRegisterRecords = clsUser.getLoginRegisterList();
         String title = "Login Register List Screen";
         String subTitle = "(" + vLoginRegisterRecords.size() + ") Record(s)";

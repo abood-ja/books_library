@@ -160,10 +160,8 @@ public class clsUser extends clsPerson{
 	    eAll(-1),
 	    pAddNewBook(1),
 	    pDeleteBook(2),
-	    pUpdateBooks(4),
-	    pFindBook(8),
-	    pManageUsers(16),
-	    pShowLoginRegister(32);
+	    pManageUsers(4);
+
 
 	    private final int value;
 

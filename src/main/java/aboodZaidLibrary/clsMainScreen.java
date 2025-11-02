@@ -4,8 +4,7 @@ public class clsMainScreen extends clsScreen {
 	private enum enMainMenuOptions {
 	    eBooks(1),
 	    eManageUsers(2),
-	    eLoginRegister(3),
-	    eExit(4);
+	    eExit(3);
 
 	    private final int value;
 
@@ -21,9 +20,9 @@ public class clsMainScreen extends clsScreen {
 	}
 	private static enMainMenuOptions _ReadMainMenuOption() {
 	    String pad = String.format("%37s", ""); 
-	    System.out.print(pad + "Choose what do you want to do? [1 to 4]? ");
+	    System.out.print(pad + "Choose what do you want to do? [1 to 3]? ");
 
-	    int choice = clsInputValidate.readIntNumberBetween(1, 4, "Enter Number between 1 to 4? ");
+	    int choice = clsInputValidate.readIntNumberBetween(1, 3, "Enter Number between 1 to 3? ");
 
 	    // Convert int to enum
 	    for (enMainMenuOptions o : enMainMenuOptions.values()) {
@@ -39,10 +38,7 @@ public class clsMainScreen extends clsScreen {
         clsBooksMenuScreen.showBooksMenu();
 	}
 	private static void _ShowManageUsersMenu() {
-        System.out.print("\nManage Users Menu Will be here...\n");
-    }
-	private static void _ShowLoginRegisterScreen() {
-        clsLoginRegisterScreen.showLoginRegisterScreen();
+       clsManageUsersMenuScreen.showManageUsersMenu();
     }
 	private static void _Logout() {
 		clsUserSession.currentUser=clsUser.find("","");
@@ -66,11 +62,6 @@ public class clsMainScreen extends clsScreen {
 	        _GoBackToMainMenu();
 	        break;
 
-	    case eLoginRegister:
-	        _ShowLoginRegisterScreen();
-	        _GoBackToMainMenu();
-	        break;
-
 	    case eExit:
 	        _Logout();
 	        break;
@@ -86,8 +77,7 @@ public class clsMainScreen extends clsScreen {
 	    System.out.println(pad + "===========================================");
 	    System.out.println(pad + "\t[1] Books Menu.");
 	    System.out.println(pad + "\t[2] Manage Users.");
-	    System.out.println(pad + "\t[3] Logins records.");
-	    System.out.println(pad + "\t[4] Logout.");
+	    System.out.println(pad + "\t[3] Logout.");
 	    System.out.println(pad + "===========================================");
 	    _PerformMainMenuOption(_ReadMainMenuOption());
 	}
