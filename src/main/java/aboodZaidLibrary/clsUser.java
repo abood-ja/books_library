@@ -22,7 +22,6 @@ public class clsUser extends clsPerson{
 	private String _Password;
 	private int _Permissions;
 	private boolean _MarkedForDelete=false;
-	private boolean _IsAdmin=false;
 	public static class clsLoginRegisterRecord {
 	        public String dateTime;
 	        public String userName;
@@ -204,7 +203,9 @@ public class clsUser extends clsPerson{
 	public String getUserName() {
 		return this._UserName;
 	}
-	
+	public boolean isAdmin(){
+        return this._Permissions==-1;
+    }
 	public void setPassword(String password) {
 		this._Password=password;
 	}

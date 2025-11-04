@@ -36,7 +36,12 @@ int failedLoginCount = 0;
     }
     clsUserSession.currentUser=user;
     clsUserSession.currentUser.registerLogin();
-    clsMainScreen.showMainMenu();
+    if(clsUserSession.currentUser.isAdmin()){
+        clsAdminMainScreen.showMainMenu();
+    }
+    else{
+        clsUserMainScreen.showMainMenu();
+    }
     return true;
 }
 public static boolean showLoginScreen() {

@@ -1,10 +1,9 @@
 package aboodZaidLibrary;
 
-public class clsMainScreen extends clsScreen {
+public class clsUserMainScreen extends clsScreen {
 	private enum enMainMenuOptions {
 	    eBooks(1),
-	    eManageUsers(2),
-	    eExit(3);
+	    eExit(2);
 
 	    private final int value;
 
@@ -20,9 +19,9 @@ public class clsMainScreen extends clsScreen {
 	}
 	private static enMainMenuOptions _ReadMainMenuOption() {
 	    String pad = String.format("%37s", ""); 
-	    System.out.print(pad + "Choose what do you want to do? [1 to 3]? ");
+	    System.out.print(pad + "Choose what do you want to do? [1 to 2]? ");
 
-	    int choice = clsInputValidate.readIntNumberBetween(1, 3, "Enter Number between 1 to 3? ");
+	    int choice = clsInputValidate.readIntNumberBetween(1, 2, "Enter Number between 1 to 2? ");
 
 	    // Convert int to enum
 	    for (enMainMenuOptions o : enMainMenuOptions.values()) {
@@ -35,11 +34,8 @@ public class clsMainScreen extends clsScreen {
 	    return null;
 	}
 	private static  void _ShowBooksMenu() {
-        clsBooksMenuScreen.showBooksMenu();
+        clsUserBooksMenuScreen.showBooksMenu();
 	}
-	private static void _ShowManageUsersMenu() {
-       clsManageUsersMenuScreen.showManageUsersMenu();
-    }
 	private static void _Logout() {
 		clsUserSession.currentUser=clsUser.find("","");
 	}
@@ -57,10 +53,7 @@ public class clsMainScreen extends clsScreen {
 	        _GoBackToMainMenu();
 	        break;
 
-	    case eManageUsers:
-	        _ShowManageUsersMenu();
-	        _GoBackToMainMenu();
-	        break;
+
 
 	    case eExit:
 	        _Logout();
@@ -76,8 +69,7 @@ public class clsMainScreen extends clsScreen {
 	    System.out.println(pad + "\t\t\tMain Menu");
 	    System.out.println(pad + "===========================================");
 	    System.out.println(pad + "\t[1] Books Menu.");
-	    System.out.println(pad + "\t[2] Manage Users.");
-	    System.out.println(pad + "\t[3] Logout.");
+	    System.out.println(pad + "\t[2] Logout.");
 	    System.out.println(pad + "===========================================");
 	    _PerformMainMenuOption(_ReadMainMenuOption());
 	}
