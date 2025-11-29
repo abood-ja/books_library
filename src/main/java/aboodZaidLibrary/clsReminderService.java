@@ -25,7 +25,6 @@ public class clsReminderService {
     private static final String USERS_FILE = "Users.txt";   // username#//#...#//#email#//#!...
     private static final String LOANS_FILE = "Loans.txt";   // isbn#//#username#//#borrow#//#due#//#returned
 
-    // ===== إعدادات SMTP (عدّلهم عند الإرسال الفعلي) =====
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final int    SMTP_PORT = 587; // TLS
     private static final String SMTP_USER = "s12218431@stu.najah.edu"; // <-- عدّل

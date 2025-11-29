@@ -4,7 +4,10 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Vector;
 
-public class clsBook {
+
+
+
+public class   clsBook {
     private enMode _Mode;
     private String _Title;
     private String _Author;

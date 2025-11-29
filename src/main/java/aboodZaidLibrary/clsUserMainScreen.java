@@ -1,76 +1,87 @@
 package aboodZaidLibrary;
 
 public class clsUserMainScreen extends clsScreen {
-	private enum enMainMenuOptions {
-	    eBooks(1),
-	    eExit(2);
 
-	    private final int value;
+    private enum enMainMenuOptions {
+        eBooksMenu(1),
+        eCDsMenu(2),
+        ePayFines(3),
+        eLogout(4);
 
-	    // Constructor
-	    enMainMenuOptions(int value) {
-	        this.value = value;
-	    }
+        private final int value;
+        enMainMenuOptions(int value) { this.value = value; }
+        public int getValue() { return value; }
+    }
 
-	    // Getter
-	    public int getValue() {
-	        return value;
-	    }
-	}
-	private static enMainMenuOptions _ReadMainMenuOption() {
-	    String pad = String.format("%37s", ""); 
-	    System.out.print(pad + "Choose what do you want to do? [1 to 2]? ");
+    private static enMainMenuOptions _ReadMainMenuOption() {
+        String pad = String.format("%37s", "");
+        System.out.print(pad + "Choose [1-4]: ");
 
-	    int choice = clsInputValidate.readIntNumberBetween(1, 2, "Enter Number between 1 to 2? ");
+        int choice = clsInputValidate.readIntNumberBetween(1, 4, "Enter number between 1 and 4: ");
 
-	    // Convert int to enum
-	    for (enMainMenuOptions o : enMainMenuOptions.values()) {
-	        if (o.getValue() == choice) {
-	            return o;
-	        }
-	    }
+        for (enMainMenuOptions o : enMainMenuOptions.values())
+            if (o.getValue() == choice) return o;
 
-	    // Should never happen because readIntNumberBetween ensures 1-4
-	    return null;
-	}
-	private static  void _ShowBooksMenu() {
+        return enMainMenuOptions.eLogout;
+    }
+
+    private static void _ShowBooksMenu() {
         clsUserBooksMenuScreen.showBooksMenu();
-	}
-	private static void _Logout() {
-		clsUserSession.currentUser=clsUser.find("","");
-	}
-	private static void _GoBackToMainMenu() {
-		String pad = String.format("%37s", "");
-		System.out.print(pad + "\nPress any key to go back to Main Menu...");
-		new java.util.Scanner(System.in).nextLine(); 
-		showMainMenu();
-	}
-	private static void _PerformMainMenuOption(enMainMenuOptions option) {
-		switch(option) {
-		case eBooks: // Example for your enum
-	        System.out.print("\033[H\033[2J"); // Clear console
-	        _ShowBooksMenu();
-	        _GoBackToMainMenu();
-	        break;
+    }
 
+    private static void _ShowCDsMenu() {
+        clsUserCDsMenuScreen.showCDsMenu();
+    }
 
+    private static void _ShowPayFinesScreen() {
+        clsPayFineScreen.showPayFineScreen();
+    }
 
-	    case eExit:
-	        _Logout();
-	        break;
-		}
-	}
-	public static void showMainMenu() {
-		System.out.print("\033[H\033[2J");
-	    System.out.flush();
-	    _DrawScreenHeader("\t\tMain Screen");
-	    String pad = String.format("%37s", "");
-	    System.out.println(pad + "===========================================");
-	    System.out.println(pad + "\t\t\tMain Menu");
-	    System.out.println(pad + "===========================================");
-	    System.out.println(pad + "\t[1] Books Menu.");
-	    System.out.println(pad + "\t[2] Logout.");
-	    System.out.println(pad + "===========================================");
-	    _PerformMainMenuOption(_ReadMainMenuOption());
-	}
+    private static void _Logout() {
+        clsUserSession.currentUser = clsUser.find("", "");
+    }
+
+    private static void _PerformMainMenuOption(enMainMenuOptions option) {
+        switch(option) {
+            case eBooksMenu:
+                System.out.print("\033[H\033[2J");
+                _ShowBooksMenu();
+                showMainMenu();
+                break;
+
+            case eCDsMenu:
+                System.out.print("\033[H\033[2J");
+                _ShowCDsMenu();
+                showMainMenu();
+                break;
+
+            case ePayFines:
+                System.out.print("\033[H\033[2J");
+                _ShowPayFinesScreen();
+                showMainMenu();
+                break;
+
+            case eLogout:
+                _Logout();
+                break;
+        }
+    }
+
+    public static void showMainMenu() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+        _DrawScreenHeader("\t\tUser Main Menu");
+
+        String pad = String.format("%37s", "");
+        System.out.println(pad + "===========================================");
+        System.out.println(pad + "\t\t\tUser Main Menu");
+        System.out.println(pad + "===========================================");
+        System.out.println(pad + "\t[1] Books Menu.");
+        System.out.println(pad + "\t[2] CDs Menu.");
+        System.out.println(pad + "\t[3] Pay Fines.");   // <-- فقط هنا
+        System.out.println(pad + "\t[4] Logout.");
+        System.out.println(pad + "===========================================");
+
+        _PerformMainMenuOption(_ReadMainMenuOption());
+    }
 }

@@ -1,8 +1,15 @@
 package aboodZaidLibrary;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.Arrays;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.regex.Pattern;
 
 public class clsUser extends clsPerson {
 
@@ -320,4 +327,114 @@ public class clsUser extends clsPerson {
         }
         return vLoginRegisterRecords;
     }
+    // ===== Borrowing & Fines Fields =====
+    private double _FineBalance = 0.0;   // total unpaid fines
+    private static final String LOANS_FILE = "Loans.txt";
+    private static final String SEP = "#//#";
+
+    public double getFineBalance() { return _FineBalance; }
+    public void addFine(double amount) { _FineBalance += amount; }
+    public void payFine(double amount) {
+        if (amount <= 0) return;
+        _FineBalance -= amount;
+        if (_FineBalance < 0) _FineBalance = 0;
+    }
+
+    // ====== Check if user has overdue loans ======
+    public boolean hasOverdue() {
+        Path f = Paths.get(LOANS_FILE);
+        if (!Files.exists(f)) return false;
+
+        LocalDate today = LocalDate.now();
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(Pattern.quote(SEP), -1);
+                if (p.length >= 5) {
+                    String username = p[1].trim();
+                    LocalDate due = LocalDate.parse(p[3].trim());
+                    boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                    if (!returned &&
+                            username.equalsIgnoreCase(this.getUserName()) &&
+                            today.isAfter(due)) {
+
+                        long days = ChronoUnit.DAYS.between(due, today);
+                        return days > 0;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    // ====== Check unpaid fines ======
+    public boolean hasUnpaidFines() {
+        return _FineBalance > 0;
+    }
+
+    // ====== Check borrow permission ======
+    public boolean canBorrow() {
+        if (hasOverdue()) {
+            System.out.println("❌ You cannot borrow: You have overdue items.");
+            return false;
+        }
+        if (hasUnpaidFines()) {
+            System.out.println("❌ You cannot borrow: You have unpaid fines = " + _FineBalance + " NIS.");
+            return false;
+        }
+        return true;
+    }
+    // ====== Check if user can be deleted ======
+    public boolean canBeDeleted() {
+        String usernameKey = this.getUserName().trim().toLowerCase();
+        Path f = Paths.get("Loans.txt");
+
+        // فحص الغرامات
+        if (this.hasUnpaidFines()) {
+            return false;
+        }
+
+        if (!Files.exists(f)) {
+            return true; // ما في إقراض أصلاً
+        }
+
+        try {
+            List<String> lines = Files.readAllLines(f);
+
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split("#//#", -1);
+
+                // عندنا نوعين:
+                // Books:   isbn#//#username#//#borrow#//#due#//#returned
+                // CDs:     CD#//#cdid#//#username#//#borrow#//#due#//#returned
+
+                if (p.length < 5) continue;
+
+                boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                String loanUser = "";
+                if (p[0].equals("CD"))      // CD loan format
+                    loanUser = p[2].trim().toLowerCase();
+                else                        // Book loan format
+                    loanUser = p[1].trim().toLowerCase();
+
+                if (loanUser.equals(usernameKey) && !returned) {
+                    return false; // عنده Item غير مُعاد
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true; // كل شيء تمام
+    }
+
 }
