@@ -283,7 +283,14 @@ public class clsUser extends clsPerson {
         }
         return enSaveResults.svFaildEmptyObject;
     }
-
+    public static void clearAllUsers() {
+        Path file = Paths.get("Users.txt");
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public boolean delete() {
         Vector<clsUser> vUsers = _LoadUsersDataFromFile();
 

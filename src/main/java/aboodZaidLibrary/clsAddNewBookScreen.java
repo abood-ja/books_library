@@ -9,7 +9,6 @@ public class clsAddNewBookScreen extends clsScreen {
 
     private static final String SEP = "#//#";
     private static final String BOOKS_FILE = "Books.txt";
-
     private static void __ensureBooksFile() {
         try {
             Path p = Paths.get(BOOKS_FILE);
