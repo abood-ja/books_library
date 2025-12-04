@@ -10,27 +10,58 @@ class TestClsBooksListScreen {
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outputStream;
 
+    private byte[] booksBackup; // backup of Books.txt
+
     @BeforeEach
     void setUp() throws IOException {
+        // Capture console output
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        // Ensure Books.txt exists (even if empty)
-        Files.write(Paths.get("Books.txt"), new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        // Ensure currentUser is always initialized
+        if (clsUserSession.currentUser == null) {
+            clsUserSession.currentUser = clsUser.GetAddNewUserObject("testuser");
+            clsUserSession.currentUser.setFirstName("Test");
+            clsUserSession.currentUser.setLastName("User");
+        }
+
+        Path booksPath = Paths.get("Books.txt");
+
+        // Backup Books.txt if it exists
+        if (Files.exists(booksPath)) {
+            booksBackup = Files.readAllBytes(booksPath);
+        } else {
+            booksBackup = null;
+        }
+
+        // Ensure Books.txt exists and is empty for testing
+        Files.write(booksPath, new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @AfterEach
     void tearDown() throws IOException {
         System.setOut(originalOut);
 
-        // Clean up Books.txt after each test
-        Files.deleteIfExists(Paths.get("Books.txt"));
+        Path booksPath = Paths.get("Books.txt");
+
+        // Restore original Books.txt after test
+        if (booksBackup != null) {
+            Files.write(booksPath, booksBackup, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } else if (Files.exists(booksPath)) {
+            Files.delete(booksPath);
+        }
+
+        // Reset currentUser to prevent interference with other tests
+        clsUserSession.currentUser = null;
+
+        // Reset test scanner if used
+        clsInputValidate.setTestScanner(null);
     }
 
     private void writeBookToFile(clsBook book) throws IOException {
-        Path file = Paths.get("Books.txt");
+        Path booksPath = Paths.get("Books.txt");
         String line = book.getTitle() + "#//#" + book.getAuthor() + "#//#" + book.getISBN() + "\n";
-        Files.write(file, line.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        Files.write(booksPath, line.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     @Test
@@ -44,7 +75,6 @@ class TestClsBooksListScreen {
 
     @Test
     void testShowBooksListScreen_WithBooks() throws IOException {
-        // Create sample books using public factory
         clsBook book1 = clsBook.GetAddNewBookObject("9780132350884");
         book1.setTitle("Clean Code");
         book1.setAuthor("Robert Martin");
@@ -60,12 +90,9 @@ class TestClsBooksListScreen {
 
         String output = outputStream.toString();
 
-        // Check table header
         assertTrue(output.contains("Title"));
         assertTrue(output.contains("Author"));
         assertTrue(output.contains("ISBN"));
-
-        // Check book data
         assertTrue(output.contains("Clean Code"));
         assertTrue(output.contains("Robert Martin"));
         assertTrue(output.contains("9780132350884"));

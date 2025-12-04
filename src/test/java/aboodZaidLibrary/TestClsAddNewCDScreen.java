@@ -9,16 +9,19 @@ class TestClsAddNewCDScreen {
 
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outContent;
+    private Path backupPath = Paths.get("CDs_backup.txt");
 
     @BeforeEach
     void setUp() throws IOException {
+        // Backup the original file
+        Path originalPath = Paths.get("CDs.txt");
+        if (Files.exists(originalPath)) {
+            Files.copy(originalPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
         // Capture console output
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
-
-        // Clean CDs.txt before each test
-        Path path = Paths.get("CDs.txt");
-        if (Files.exists(path)) Files.delete(path);
 
         // Create a user with full permission
         clsUserSession.currentUser = new clsUser(
@@ -37,9 +40,12 @@ class TestClsAddNewCDScreen {
     void tearDown() throws IOException {
         System.setOut(originalOut);
 
-        // Clean CDs.txt after test
-        Path path = Paths.get("CDs.txt");
-        if (Files.exists(path)) Files.delete(path);
+        // Restore the original file
+        Path originalPath = Paths.get("CDs.txt");
+        if (Files.exists(backupPath)) {
+            Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(backupPath);
+        }
 
         clsUserSession.currentUser = null;
         clsInputValidate.setTestScanner(null); // Reset test scanner
@@ -47,6 +53,9 @@ class TestClsAddNewCDScreen {
 
     @Test
     void testAddNewCDSuccessfully() throws IOException {
+        // Ensure file is empty for this test
+        Files.write(Paths.get("CDs.txt"), new byte[0]);
+
         String simulatedInput = "Best Hits\nArtist Name\nCD123\n";
         clsInputValidate.setTestScanner(
                 new java.util.Scanner(new ByteArrayInputStream(simulatedInput.getBytes()))

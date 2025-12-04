@@ -1,11 +1,9 @@
 package aboodZaidLibrary;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDate;
-
 import org.junit.jupiter.api.*;
 
 class TestClsPayFineScreen {
@@ -14,6 +12,7 @@ class TestClsPayFineScreen {
     private final PrintStream originalOut = System.out;
 
     private static final Path LOANS_FILE = Paths.get("Loans.txt");
+    private byte[] loansBackup; // Backup of Loans.txt
 
     @BeforeEach
     void setUp() throws IOException {
@@ -24,19 +23,34 @@ class TestClsPayFineScreen {
         clsUserSession.currentUser.setFirstName("Test");
         clsUserSession.currentUser.setLastName("User");
 
-        // Delete loans file to start fresh
-        Files.deleteIfExists(LOANS_FILE);
+        // Backup Loans.txt if it exists
+        if (Files.exists(LOANS_FILE)) {
+            loansBackup = Files.readAllBytes(LOANS_FILE);
+        } else {
+            loansBackup = null;
+        }
     }
 
     @AfterEach
     void tearDown() throws IOException {
         System.setOut(originalOut);
-        Files.deleteIfExists(LOANS_FILE);
+
+        // Restore Loans.txt from backup
+        if (loansBackup != null) {
+            Files.write(LOANS_FILE, loansBackup, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } else if (Files.exists(LOANS_FILE)) {
+            Files.delete(LOANS_FILE);
+        }
+
+        clsUserSession.currentUser = null;
+        clsInputValidate.setTestScanner(null);
     }
 
     @Test
-    void testNoLoansFile() {
-        // Loans file does not exist
+    void testNoLoansFile() throws IOException {
+        // Ensure Loans.txt does not exist for this test
+        Files.deleteIfExists(LOANS_FILE);
+
         clsPayFineScreen.showPayFineScreen();
         String output = outContent.toString();
         assertTrue(output.contains("No loans found") || output.contains("You have no fines to pay"));
@@ -44,8 +58,8 @@ class TestClsPayFineScreen {
 
     @Test
     void testNoFines() throws IOException {
-        // Create empty loans file
-        Files.createFile(LOANS_FILE);
+        // Create empty Loans.txt safely
+        Files.write(LOANS_FILE, new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         clsPayFineScreen.showPayFineScreen();
         String output = outContent.toString();
@@ -55,8 +69,10 @@ class TestClsPayFineScreen {
     @Test
     void testBookFinePayment() throws IOException {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        String loanLine = "ISBN123" + "#//#" + "testuser" + "#//#" + "Book Title" + "#//#" + yesterday + "#//#" + "false";
-        Files.write(LOANS_FILE, loanLine.getBytes());
+        String loanLine = "ISBN123#//#testuser#//#Book Title#//#" + yesterday + "#//#false";
+
+        // Write loan line safely
+        Files.write(LOANS_FILE, loanLine.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         // Simulate user input 'y'
         clsInputValidate.setTestScanner(new java.util.Scanner("y\n"));
@@ -74,9 +90,10 @@ class TestClsPayFineScreen {
     @Test
     void testCDFinePayment() throws IOException {
         LocalDate yesterday = LocalDate.now().minusDays(2);
-        // CD format: 6 parts
-        String loanLine = "CD-001" + "#//#" + "CD Title" + "#//#" + "testuser" + "#//#" + "other" + "#//#" + yesterday + "#//#" + "false";
-        Files.write(LOANS_FILE, loanLine.getBytes());
+        String loanLine = "CD-001#//#CD Title#//#testuser#//#other#//#" + yesterday + "#//#false";
+
+        // Write loan line safely
+        Files.write(LOANS_FILE, loanLine.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         // Simulate user input 'y'
         clsInputValidate.setTestScanner(new java.util.Scanner("y\n"));
@@ -94,8 +111,10 @@ class TestClsPayFineScreen {
     @Test
     void testPaymentCanceled() throws IOException {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        String loanLine = "ISBN123" + "#//#" + "testuser" + "#//#" + "Book Title" + "#//#" + yesterday + "#//#" + "false";
-        Files.write(LOANS_FILE, loanLine.getBytes());
+        String loanLine = "ISBN123#//#testuser#//#Book Title#//#" + yesterday + "#//#false";
+
+        // Write loan line safely
+        Files.write(LOANS_FILE, loanLine.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         // Simulate user input 'n'
         clsInputValidate.setTestScanner(new java.util.Scanner("n\n"));

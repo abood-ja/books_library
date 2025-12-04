@@ -14,7 +14,7 @@ public class clsFindUserScreen extends clsScreen{
         System.out.print("___________________");
     }
     public static void showFindUserScreen(){
-        String title="Add New User Screen";
+        String title="Find User Screen";
         clsScreen._DrawScreenHeader(title);
         String userName;
         System.out.print("\nPlease enter Account Username: ");
@@ -28,8 +28,6 @@ public class clsFindUserScreen extends clsScreen{
             System.out.print("\nUser Found :-)\n");
             _PrintUser(user);
         }
-        else{
-            System.out.print("\nUser Was not Found :-)\\n");
-        }
+
     }
 }

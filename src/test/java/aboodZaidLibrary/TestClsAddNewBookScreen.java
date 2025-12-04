@@ -11,26 +11,32 @@ class TestClsAddNewBookScreen {
     private final InputStream originalIn = System.in;
     private ByteArrayOutputStream outContent;
 
+    private byte[] booksBackup; // Backup of Books.txt
+
     @BeforeEach
     void setUp() throws IOException {
         // Capture console output
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
-        // Clean Books.txt before each test
-        Path path = Paths.get("Books.txt");
-        if (Files.exists(path)) Files.delete(path);
+        // Backup the original Books.txt content if it exists
+        Path booksPath = Paths.get("Books.txt");
+        if (Files.exists(booksPath)) {
+            booksBackup = Files.readAllBytes(booksPath);
+        } else {
+            booksBackup = null;
+        }
 
-        // Create a user with proper constructor and grant add book permission
+        // Set up user session with full permissions
         clsUserSession.currentUser = new clsUser(
-                clsUser.enMode.AddNewMode,   // mode
-                "John",                      // firstName
-                "Doe",                       // lastName
-                "john@example.com",           // email
-                "12345678",                   // phone
-                "johndoe",                   // username
-                "password123",               // password
-                clsUser.enPermissions.eAll.getValue() // full permission
+                clsUser.enMode.AddNewMode,
+                "John",
+                "Doe",
+                "john@example.com",
+                "12345678",
+                "johndoe",
+                "password123",
+                clsUser.enPermissions.eAll.getValue()
         );
     }
 
@@ -39,11 +45,15 @@ class TestClsAddNewBookScreen {
         System.setOut(originalOut);
         System.setIn(originalIn);
 
-        // Clean Books.txt after test
-        Path path = Paths.get("Books.txt");
-        if (Files.exists(path)) Files.delete(path);
-
         clsUserSession.currentUser = null;
+
+        // Restore the original Books.txt content
+        Path booksPath = Paths.get("Books.txt");
+        if (booksBackup != null) {
+            Files.write(booksPath, booksBackup);
+        } else if (Files.exists(booksPath)) {
+            Files.delete(booksPath);
+        }
     }
 
     @Test

@@ -11,10 +11,23 @@ import org.junit.jupiter.api.*;
 class TestClsCD {
 
     private static final String CDS_FILE = "CDs.txt";
+    private static final String BACKUP_FILE = "CDs_backup.txt";
+
+    @BeforeAll
+    static void backupOriginalFile() throws IOException {
+        Path originalPath = Paths.get(CDS_FILE);
+        Path backupPath = Paths.get(BACKUP_FILE);
+
+        if (Files.exists(originalPath)) {
+            Files.copy(originalPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            Files.createFile(backupPath);
+        }
+    }
 
     @BeforeEach
     void setUp() throws IOException {
-        // Ensure a clean file before each test
+        // Ensure a clean file for each test
         Files.deleteIfExists(Paths.get(CDS_FILE));
         Files.createFile(Paths.get(CDS_FILE));
     }
@@ -24,6 +37,20 @@ class TestClsCD {
         Files.deleteIfExists(Paths.get(CDS_FILE));
     }
 
+    @AfterAll
+    static void restoreOriginalFile() throws IOException {
+        Path originalPath = Paths.get(CDS_FILE);
+        Path backupPath = Paths.get(BACKUP_FILE);
+
+        Files.deleteIfExists(originalPath);
+
+        if (Files.exists(backupPath)) {
+            Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(backupPath); // clean up backup
+        }
+    }
+
+    // --- Your tests remain unchanged ---
     @Test
     void testCreateCDAndSettersGetters() {
         clsCD cd = clsCD.GetAddNewCDObject("CD001");

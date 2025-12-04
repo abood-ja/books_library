@@ -11,10 +11,24 @@ import org.junit.jupiter.api.*;
 class TestClsBook {
 
     private static final String BOOKS_FILE = "Books.txt";
+    private static final String BACKUP_FILE = "Books_backup.txt";
+
+    @BeforeAll
+    static void backupOriginalFile() throws IOException {
+        Path originalPath = Paths.get(BOOKS_FILE);
+        Path backupPath = Paths.get(BACKUP_FILE);
+
+        if (Files.exists(originalPath)) {
+            Files.copy(originalPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            // If no original file, create empty backup to keep consistent
+            Files.createFile(backupPath);
+        }
+    }
 
     @BeforeEach
     void setUp() throws IOException {
-        // Ensure a clean file before each test
+        // Ensure a clean file for each test
         Files.deleteIfExists(Paths.get(BOOKS_FILE));
         Files.createFile(Paths.get(BOOKS_FILE));
     }
@@ -24,6 +38,22 @@ class TestClsBook {
         Files.deleteIfExists(Paths.get(BOOKS_FILE));
     }
 
+    @AfterAll
+    static void restoreOriginalFile() throws IOException {
+        Path originalPath = Paths.get(BOOKS_FILE);
+        Path backupPath = Paths.get(BACKUP_FILE);
+
+        // Delete test file if it exists
+        Files.deleteIfExists(originalPath);
+
+        // Restore the backup
+        if (Files.exists(backupPath)) {
+            Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(backupPath); // Optional: clean up backup after restore
+        }
+    }
+
+    // --- Your tests below remain unchanged ---
     @Test
     void testCreateBookAndSettersGetters() {
         clsBook book = clsBook.GetAddNewBookObject("ISBN001");
@@ -34,7 +64,7 @@ class TestClsBook {
         assertEquals("Test Author", book.getAuthor());
         assertEquals("ISBN001", book.getISBN());
         assertFalse(book.isMarkedForDeleted());
-        assertFalse(book.isEmpty()); // AddNewBookObject is not empty
+        assertFalse(book.isEmpty());
     }
 
     @Test
@@ -46,7 +76,6 @@ class TestClsBook {
         clsBook.enSaveResults result = book.save();
         assertEquals(clsBook.enSaveResults.svSucceeded, result);
 
-        // Verify book is in file
         clsBook loaded = clsBook.findBookByISBN("ISBN002");
         assertEquals("Book Title", loaded.getTitle());
         assertEquals("Author Name", loaded.getAuthor());
@@ -77,7 +106,6 @@ class TestClsBook {
         boolean deleted = book.delete();
         assertTrue(deleted);
 
-        // After delete, findBookByISBN returns empty book
         clsBook loaded = clsBook.findBookByISBN("ISBN004");
         assertTrue(loaded.isEmpty());
     }
@@ -114,9 +142,9 @@ class TestClsBook {
         Vector<clsBook> byAuthor = clsBook.findBooksByAuthor("Author2");
         Vector<clsBook> byISBN = clsBook.findBooksByISBN("ISBN006");
 
-        assertEquals(2, byTitle.size()); // Both books have Title1
-        assertEquals(1, byAuthor.size()); // Only book2 has Author2
-        assertEquals(1, byISBN.size()); // Only book1 has ISBN006
+        assertEquals(2, byTitle.size());
+        assertEquals(1, byAuthor.size());
+        assertEquals(1, byISBN.size());
     }
 
     @Test

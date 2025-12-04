@@ -12,7 +12,7 @@ public class clsCD {
     private String _CDID;
     private boolean _MarkedForDelete = false;
 
-    private enum enMode {
+    public enum enMode {
         EmptyMode(0),
         AddNewMode(1),
         UpdateMode(2);

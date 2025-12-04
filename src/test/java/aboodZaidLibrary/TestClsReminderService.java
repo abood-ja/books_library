@@ -14,25 +14,56 @@ class TestClsReminderService {
     private static final String LOANS_FILE = "Loans.txt";
     private static final String SEP = "#//#";
 
+    private byte[] usersBackup;
+    private byte[] loansBackup;
+
     @BeforeEach
     void setup() throws Exception {
-        // Clear files before each test
-        Files.deleteIfExists(Paths.get(USERS_FILE));
-        Files.deleteIfExists(Paths.get(LOANS_FILE));
+        // Backup Users.txt if it exists
+        Path usersPath = Paths.get(USERS_FILE);
+        if (Files.exists(usersPath)) {
+            usersBackup = Files.readAllBytes(usersPath);
+        } else {
+            usersBackup = null;
+        }
+
+        // Backup Loans.txt if it exists
+        Path loansPath = Paths.get(LOANS_FILE);
+        if (Files.exists(loansPath)) {
+            loansBackup = Files.readAllBytes(loansPath);
+        } else {
+            loansBackup = null;
+        }
+
+        // Create empty files for testing
+        Files.write(usersPath, new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.write(loansPath, new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @AfterEach
     void cleanup() throws Exception {
-        Files.deleteIfExists(Paths.get(USERS_FILE));
-        Files.deleteIfExists(Paths.get(LOANS_FILE));
+        Path usersPath = Paths.get(USERS_FILE);
+        Path loansPath = Paths.get(LOANS_FILE);
+
+        // Restore Users.txt from backup
+        if (usersBackup != null) {
+            Files.write(usersPath, usersBackup, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } else if (Files.exists(usersPath)) {
+            Files.delete(usersPath);
+        }
+
+        // Restore Loans.txt from backup
+        if (loansBackup != null) {
+            Files.write(loansPath, loansBackup, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } else if (Files.exists(loansPath)) {
+            Files.delete(loansPath);
+        }
     }
 
     @Test
     void testNoUsersOrLoans() {
-        // Nothing in files
         clsReminderService.sendOverdueRemindersNow();
-        // Should not throw exceptions
-        assertTrue(true);
+        assertTrue(true); // just ensure no exceptions
     }
 
     @Test
@@ -40,19 +71,14 @@ class TestClsReminderService {
         String username = "john";
         String email = "john@example.com";
 
-        // Write Users.txt
         String userLine = "John#//#Doe#//#" + email + "#//#12345#//#" + username + "#//#pass#//#perm";
         Files.write(Paths.get(USERS_FILE), Collections.singletonList(userLine), StandardCharsets.UTF_8);
 
-        // Write Loans.txt with overdue book
         LocalDate dueDate = LocalDate.now().minusDays(5);
         String loanLine = "ISBN-001" + SEP + username + SEP + "borrowDate" + SEP + dueDate.toString() + SEP + "false";
         Files.write(Paths.get(LOANS_FILE), Collections.singletonList(loanLine), StandardCharsets.UTF_8);
 
-        // Call method
         clsReminderService.sendOverdueRemindersNow();
-
-        // If DRY_RUN is true, it prints; otherwise, it would send email. We just assert no exceptions.
         assertTrue(true);
     }
 
@@ -63,27 +89,21 @@ class TestClsReminderService {
         String username2 = "bob";
         String email2 = "bob@example.com";
 
-        // Users.txt
         List<String> users = Arrays.asList(
                 "Alice#//#Smith#//#" + email1 + "#//#123#//#" + username1 + "#//#pass#//#perm",
                 "Bob#//#Jones#//#" + email2 + "#//#456#//#" + username2 + "#//#pass#//#perm"
         );
         Files.write(Paths.get(USERS_FILE), users, StandardCharsets.UTF_8);
 
-        // Loans.txt
         LocalDate due1 = LocalDate.now().minusDays(3);
         LocalDate due2 = LocalDate.now().minusDays(7);
-
         List<String> loans = Arrays.asList(
                 "ISBN-A1" + SEP + username1 + SEP + "borrow1" + SEP + due1.toString() + SEP + "false",
                 "ISBN-B1" + SEP + username2 + SEP + "borrow2" + SEP + due2.toString() + SEP + "false"
         );
         Files.write(Paths.get(LOANS_FILE), loans, StandardCharsets.UTF_8);
 
-        // Call method
         clsReminderService.sendOverdueRemindersNow();
-
-        // Just assert it ran without exceptions
         assertTrue(true);
     }
 
@@ -92,18 +112,14 @@ class TestClsReminderService {
         String username = "charlie";
         String email = "charlie@example.com";
 
-        // Users.txt
         String userLine = "Charlie#//#Brown#//#" + email + "#//#789#//#" + username + "#//#pass#//#perm";
         Files.write(Paths.get(USERS_FILE), Collections.singletonList(userLine), StandardCharsets.UTF_8);
 
-        // Loans.txt with returned loan
         LocalDate dueDate = LocalDate.now().minusDays(10);
         String loanLine = "ISBN-R1" + SEP + username + SEP + "borrow" + SEP + dueDate.toString() + SEP + "true";
         Files.write(Paths.get(LOANS_FILE), Collections.singletonList(loanLine), StandardCharsets.UTF_8);
 
         clsReminderService.sendOverdueRemindersNow();
-
-        // Should run without exception since returned loans are ignored
         assertTrue(true);
     }
 }
