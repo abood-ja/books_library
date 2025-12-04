@@ -90,7 +90,7 @@ public class clsAddUserScreen extends clsScreen {
                 System.out.print("\nUser Added successfully :-)\n");
                 _PrintUser(newUser);
 
-                // ===== NEW: رسالة ترحيب تلقائيًا =====
+
                 try {
                     String subject = "Welcome to Abood & Zaid Library System!";
                     String body =
