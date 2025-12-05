@@ -150,4 +150,6 @@ class TestClsCD {
         Vector<clsCD> cds = clsCD.getCDsList();
         assertEquals(2, cds.size());
     }
+
 }
+

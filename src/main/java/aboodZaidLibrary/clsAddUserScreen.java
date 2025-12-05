@@ -118,4 +118,5 @@ public class clsAddUserScreen extends clsScreen {
                 break;
         }
     }
+
 }

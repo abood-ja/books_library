@@ -162,4 +162,111 @@ class TestClsBook {
         Vector<clsBook> books = clsBook.getBooksList();
         assertEquals(2, books.size());
     }
+
+
+    // Add these test methods to TestClsBook.java
+
+
+    @Test
+    void testIsBookExist() {
+        clsBook book = clsBook.GetAddNewBookObject("ISBN011");
+        book.setTitle("Existence Test");
+        book.setAuthor("Author Z");
+        book.save();
+
+        assertTrue(clsBook.isBookExist("ISBN011"));
+        assertFalse(clsBook.isBookExist("ISBN999"));
+    }
+
+    @Test
+    void testSave_EmptyMode() {
+        // Create a book in empty mode (shouldn't be possible normally, but test the guard)
+        clsBook emptyBook = new clsBook(clsBook.enMode.EmptyMode, "", "", "");
+
+        clsBook.enSaveResults result = emptyBook.save();
+        assertEquals(clsBook.enSaveResults.svFaildEmptyObject, result);
+    }
+
+
+    @Test
+    void testMultipleBooksWithSameTitle() {
+        clsBook book1 = clsBook.GetAddNewBookObject("ISBN013");
+        book1.setTitle("Same Title");
+        book1.setAuthor("Author A");
+        book1.save();
+
+        clsBook book2 = clsBook.GetAddNewBookObject("ISBN014");
+        book2.setTitle("Same Title");
+        book2.setAuthor("Author B");
+        book2.save();
+
+        Vector<clsBook> books = clsBook.findBooksByTitle("Same Title");
+        assertEquals(2, books.size());
+
+        // Verify both books are in the results
+        boolean foundISBN013 = false;
+        boolean foundISBN014 = false;
+
+        for (clsBook book : books) {
+            if (book.getISBN().equals("ISBN013")) foundISBN013 = true;
+            if (book.getISBN().equals("ISBN014")) foundISBN014 = true;
+        }
+
+        assertTrue(foundISBN013);
+        assertTrue(foundISBN014);
+    }
+
+    @Test
+    void testMultipleBooksWithSameAuthor() {
+        clsBook book1 = clsBook.GetAddNewBookObject("ISBN015");
+        book1.setTitle("Book One");
+        book1.setAuthor("Same Author");
+        book1.save();
+
+        clsBook book2 = clsBook.GetAddNewBookObject("ISBN016");
+        book2.setTitle("Book Two");
+        book2.setAuthor("Same Author");
+        book2.save();
+
+        Vector<clsBook> books = clsBook.findBooksByAuthor("Same Author");
+        assertEquals(2, books.size());
+    }
+
+    @Test
+    void testFindNonExistentBook() {
+        clsBook book = clsBook.findBookByISBN("NONEXISTENT");
+        assertTrue(book.isEmpty());
+
+        clsBook bookByTitle = clsBook.findBookByTitle("Nonexistent Title");
+        assertTrue(bookByTitle.isEmpty());
+
+        clsBook bookByAuthor = clsBook.findBookByAuthor("Nonexistent Author");
+        assertTrue(bookByAuthor.isEmpty());
+    }
+
+    @Test
+    void testEmptyBooksList() {
+        Vector<clsBook> books = clsBook.getBooksList();
+        assertEquals(0, books.size());
+    }
+
+    @Test
+    void testSettersModifyCorrectFields() {
+        clsBook book = clsBook.GetAddNewBookObject("ISBN017");
+
+        book.setTitle("New Title");
+        assertEquals("New Title", book.getTitle());
+        assertEquals("", book.getAuthor());
+        assertEquals("ISBN017", book.getISBN());
+
+        book.setAuthor("New Author");
+        assertEquals("New Title", book.getTitle());
+        assertEquals("New Author", book.getAuthor());
+        assertEquals("ISBN017", book.getISBN());
+
+        book.setISBN("ISBN018");
+        assertEquals("New Title", book.getTitle());
+        assertEquals("New Author", book.getAuthor());
+        assertEquals("ISBN018", book.getISBN());
+    }
 }

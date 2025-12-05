@@ -1,7 +1,7 @@
 package aboodZaidLibrary;
 
 public class clsAdminBooksMenuScreen extends clsScreen {
-    private enum enBooksMenuOptions {
+    public enum enBooksMenuOptions {
         eBooksList(1),
         eFindBook(2),
         eAddBook(3),

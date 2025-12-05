@@ -783,6 +783,509 @@ static clsDate date;
 		 assertEquals(dateString,"10/12/2023");
 		 
 	 }
+
+
+    // Add these test methods to your TestClsDate class to achieve 100% coverage
+
+// ============== Missing Tests for Constructors ==============
+
+    @Test
+    void testClsDateConstructor_CopyConstructor() {
+        // Arrange
+        clsDate original = new clsDate(15, 6, 2023);
+
+        // Action
+        clsDate copy = new clsDate(original);
+
+        // Assert
+        assertEquals(15, copy.getDay());
+        assertEquals(6, copy.getMonth());
+        assertEquals(2023, copy.getYear());
+    }
+
+    @Test
+    void testClsDateConstructor_String_ValidDate() {
+        // Action
+        clsDate date = new clsDate("15/6/2023");
+
+        // Assert
+        assertEquals(15, date.getDay());
+        assertEquals(6, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidFormat() {
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("invalid/date/format");
+        });
+        assertTrue(exception.getMessage().contains("Day, month, and year must be valid integers"));
+    }
+
+    @Test
+    void testClsDateConstructor_DayMonthYear_ValidDate() {
+        // Action
+        clsDate date = new clsDate(15, 6, 2023);
+
+        // Assert
+        assertEquals(15, date.getDay());
+        assertEquals(6, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+// ============== Missing Tests for Setters ==============
+
+    @Test
+    void testSetDay_ValidDay() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Action
+        date.setDay(15);
+
+        // Assert
+        assertEquals(15, date.getDay());
+    }
+
+    @Test
+    void testSetDay_InvalidDay() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setDay(32);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testSetMonth_ValidMonth() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Action
+        date.setMonth(6);
+
+        // Assert
+        assertEquals(6, date.getMonth());
+    }
+
+    @Test
+    void testSetMonth_InvalidMonth() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setMonth(13);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testSetYear_ValidYear() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Action
+        date.setYear(2025);
+
+        // Assert
+        assertEquals(2025, date.getYear());
+    }
+
+    @Test
+    void testSetYear_InvalidYear() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setYear(0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+// ============== Missing Tests for Instance Methods ==============
+
+    @Test
+    void testIsLeapYear_InstanceMethod() {
+        // Arrange
+        clsDate leapYearDate = new clsDate(1, 1, 2000);
+        clsDate nonLeapYearDate = new clsDate(1, 1, 2001);
+
+        // Assert
+        assertTrue(leapYearDate.isLeapYear());
+        assertFalse(nonLeapYearDate.isLeapYear());
+    }
+
+    @Test
+    void testNumberOfDaysInAYear_InstanceMethod() {
+        // Arrange
+        clsDate leapYearDate = new clsDate(1, 1, 2000);
+        clsDate nonLeapYearDate = new clsDate(1, 1, 2001);
+
+        // Assert
+        assertEquals(366, leapYearDate.numberOfDaysInAYear());
+        assertEquals(365, nonLeapYearDate.numberOfDaysInAYear());
+    }
+
+    @Test
+    void testNumberOfHoursInAYear_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2000);
+
+        // Assert
+        assertEquals(366 * 24, date.numberOfHoursInAYear());
+    }
+
+    @Test
+    void testNumberOfMinutesInAYear_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2000);
+
+        // Assert
+        assertEquals(366 * 24 * 60, date.numberOfMinutesInAYear());
+    }
+
+    @Test
+    void testNumberOfSecondsInAYear_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2000);
+
+        // Assert
+        assertEquals(366 * 24 * 60 * 60, date.numberOfSecondsInAYear());
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 2, 2000);
+
+        // Assert
+        assertEquals(29, date.numberOfDaysInAMonth());
+    }
+
+    @Test
+    void testNumberOfHoursInAMonth_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 2, 2000);
+
+        // Assert
+        assertEquals(29 * 24, date.numberOfHoursInAMonth());
+    }
+
+    @Test
+    void testNumberOfMinutesInAMonth_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 2, 2000);
+
+        // Assert
+        assertEquals(29 * 24 * 60, date.numberOfMinutesInAMonth());
+    }
+
+    @Test
+    void testNumberOfSecondsInAMonth_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 2, 2000);
+
+        // Assert
+        assertEquals(29 * 24 * 60 * 60, date.numberOfSecondsInAMonth());
+    }
+
+    @Test
+    void testDayOfWeekOrder_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2000);
+
+        // Assert
+        assertEquals(6, date.dayOfWeekOrder());
+    }
+
+    @Test
+    void testDayShortName_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2000);
+
+        // Assert
+        assertEquals("Sat", date.dayShortName());
+    }
+
+    @Test
+    void testMonthShortName_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 6, 2000);
+
+        // Assert
+        assertEquals("Jun", date.monthShortName());
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 2, 2025);
+
+        // Assert
+        assertEquals(32, date.daysFromTheBeginningOfTheYear());
+    }
+
+// ============== Missing Tests for Static Methods ==============
+
+    @Test
+    void testGetSystemDateTimeString() {
+        // Action
+        String dateTime = clsDate.getSystemDateTimeString();
+
+        // Assert
+        assertNotNull(dateTime);
+        assertTrue(dateTime.matches("\\d{2}/\\d{2}/\\d{4} - \\d{2}:\\d{2}:\\d{2}"));
+    }
+
+    @Test
+    void testDateToString_Static() {
+        // Arrange
+        clsDate date = new clsDate(10, 12, 2023);
+
+        // Action
+        String dateString = clsDate.DateToString(date);
+
+        // Assert
+        assertEquals("10/12/2023", dateString);
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear() {
+        // Action
+        clsDate date = clsDate.getDateFromDayOrderInYear(32, 2025);
+
+        // Assert
+        assertEquals(1, date.getDay());
+        assertEquals(2, date.getMonth());
+        assertEquals(2025, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_LastDayOfYear() {
+        // Action
+        clsDate date = clsDate.getDateFromDayOrderInYear(365, 2023);
+
+        // Assert
+        assertEquals(31, date.getDay());
+        assertEquals(12, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_LeapYear() {
+        // Action
+        clsDate date = clsDate.getDateFromDayOrderInYear(366, 2024);
+
+        // Assert
+        assertEquals(31, date.getDay());
+        assertEquals(12, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+// ============== Missing Tests for addDays ==============
+
+    @Test
+    void testAddDays_NegativeDays() {
+        // Arrange
+        clsDate date = new clsDate(15, 6, 2023);
+
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.addDays(-5);
+        });
+        assertTrue(exception.getMessage().contains("days must be positive"));
+    }
+
+    @Test
+    void testAddDays_MultipleMonths() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Action
+        date.addDays(90);
+
+        // Assert
+        assertEquals(1, date.getDay());
+        assertEquals(4, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testAddDays_CrossingYears() {
+        // Arrange
+        clsDate date = new clsDate(1, 12, 2023);
+
+        // Action
+        date.addDays(40);
+
+        // Assert
+        assertEquals(10, date.getDay());
+        assertEquals(1, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+// ============== Missing Tests for Date Comparison ==============
+
+    @Test
+    void testIsDateBeforeDate2_InstanceMethod_True() {
+        // Arrange
+        clsDate date1 = new clsDate(1, 1, 2020);
+        clsDate date2 = new clsDate(2, 1, 2020);
+
+        // Assert
+        assertTrue(date1.isDateBeforeDate2(date2));
+    }
+
+    @Test
+    void testIsDateBeforeDate2_InstanceMethod_False() {
+        // Arrange
+        clsDate date1 = new clsDate(2, 1, 2020);
+        clsDate date2 = new clsDate(1, 1, 2020);
+
+        // Assert
+        assertFalse(date1.isDateBeforeDate2(date2));
+    }
+
+    @Test
+    void testIsDateEqualDate2_InstanceMethod_True() {
+        // Arrange
+        clsDate date1 = new clsDate(1, 1, 2020);
+        clsDate date2 = new clsDate(1, 1, 2020);
+
+        // Assert
+        assertTrue(date1.isDateEqualDate2(date2));
+    }
+
+    @Test
+    void testIsDateEqualDate2_InstanceMethod_False() {
+        // Arrange
+        clsDate date1 = new clsDate(1, 1, 2020);
+        clsDate date2 = new clsDate(2, 1, 2020);
+
+        // Assert
+        assertFalse(date1.isDateEqualDate2(date2));
+    }
+
+    @Test
+    void testGetDifferenceInDays_InstanceMethod() {
+        // Arrange
+        clsDate date1 = new clsDate(1, 1, 2020);
+        clsDate date2 = new clsDate(10, 1, 2020);
+
+        // Assert
+        assertEquals(9, date1.getDifferenceInDays(date2));
+    }
+
+// ============== Missing Tests for Print Methods ==============
+
+    @Test
+    void testPrintMonthCalendar_StaticMethod() {
+        // This test verifies the method doesn't throw exceptions
+        assertDoesNotThrow(() -> {
+            clsDate.printMonthCalendar(6, 2023);
+        });
+    }
+
+    @Test
+    void testPrintMonthCalendar_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 6, 2023);
+
+        // Assert
+        assertDoesNotThrow(() -> {
+            date.printMonthCalendar();
+        });
+    }
+
+    @Test
+    void testPrintMonthCalendar_InvalidMonth() {
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.printMonthCalendar(13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testPrintMonthCalendar_InvalidYear() {
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.printMonthCalendar(6, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+    @Test
+    void testPrintYearCalendar_StaticMethod() {
+        // This test verifies the method doesn't throw exceptions
+        assertDoesNotThrow(() -> {
+            clsDate.printYearCalendar(2023);
+        });
+    }
+
+    @Test
+    void testPrintYearCalendar_InstanceMethod() {
+        // Arrange
+        clsDate date = new clsDate(1, 1, 2023);
+
+        // Assert
+        assertDoesNotThrow(() -> {
+            date.printYearCalendar();
+        });
+    }
+
+    @Test
+    void testPrintYearCalendar_InvalidYear() {
+        // Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.printYearCalendar(0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+// ============== Edge Cases and Additional Coverage ==============
+
+    @Test
+    void testAddDays_Zero() {
+        // Arrange
+        clsDate date = new clsDate(15, 6, 2023);
+
+        // Action
+        date.addDays(0);
+
+        // Assert
+        assertEquals(15, date.getDay());
+        assertEquals(6, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_MonthAndYearSame_Date1After() {
+        // Arrange
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(10, 6, 2023);
+
+        // Assert
+        assertFalse(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_YearDifferent_MonthAndDaySame() {
+        // Arrange
+        clsDate date1 = new clsDate(15, 6, 2022);
+        clsDate date2 = new clsDate(15, 6, 2023);
+
+        // Assert
+        assertTrue(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+
 	
 	 
 }

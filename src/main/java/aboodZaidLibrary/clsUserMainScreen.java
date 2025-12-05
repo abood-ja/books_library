@@ -1,8 +1,8 @@
 package aboodZaidLibrary;
 
 public class clsUserMainScreen extends clsScreen {
-
-    private enum enMainMenuOptions {
+    private static boolean TEST_MODE = false; // set true in tests
+    public enum enMainMenuOptions {
         eBooksMenu(1),
         eCDsMenu(2),
         ePayFines(3),
@@ -26,21 +26,37 @@ public class clsUserMainScreen extends clsScreen {
     }
 
     private static void _ShowBooksMenu() {
-        clsUserBooksMenuScreen.showBooksMenu();
+        if (TEST_MODE) {
+            System.out.println("[TEST_MODE] _ShowBooksMenu called");
+        } else {
+            clsUserBooksMenuScreen.showBooksMenu();
+        }
     }
 
     private static void _ShowCDsMenu() {
-        clsUserCDsMenuScreen.showCDsMenu();
+        if (TEST_MODE) {
+            System.out.println("[TEST_MODE] _ShowCDsMenu called");
+        } else {
+            clsUserCDsMenuScreen.showCDsMenu();
+        }
     }
 
     private static void _ShowPayFinesScreen() {
-        clsPayFineScreen.showPayFineScreen();
+        if (TEST_MODE) {
+            System.out.println("[TEST_MODE] _ShowPayFinesScreen called");
+        } else {
+            clsPayFineScreen.showPayFineScreen();
+        }
     }
-
     private static void _Logout() {
-        clsUserSession.currentUser = clsUser.find("", "");
+        if (TEST_MODE) {
+            // In test mode, just set to null for easy testing
+            clsUserSession.currentUser = null;
+        } else {
+            // Normal behavior
+            clsUserSession.currentUser = clsUser.find("", "");
+        }
     }
-
     private static void _PerformMainMenuOption(enMainMenuOptions option) {
         switch(option) {
             case eBooksMenu:

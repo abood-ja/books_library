@@ -1,7 +1,8 @@
 package aboodZaidLibrary;
 
 public class clsManageUsersMenuScreen extends clsScreen{
-    private enum enManageUsersMenuOptions {
+    public static boolean TEST_MODE = false; // default false
+    public enum enManageUsersMenuOptions {
         eUsersList(1),
         eAddNewUser(2),
         eFindUser(3),
@@ -36,20 +37,44 @@ public class clsManageUsersMenuScreen extends clsScreen{
 
         return null;
     }
-    private static void _ShowUsersListScreen(){
-        clsUserListScreen.showUserListScreen();
+    private static void _ShowUsersListScreen() {
+        if (TEST_MODE) {
+            System.out.println("TEST_MODE: _ShowUsersListScreen called");
+        } else {
+            clsUserListScreen.showUserListScreen();
+        }
     }
-    private static void _ShowAddUsersListScreen(){
-       clsAddUserScreen.showAddUserScreen();
+
+    private static void _ShowAddUsersListScreen() {
+        if (TEST_MODE) {
+            System.out.println("TEST_MODE: _ShowAddUsersListScreen called");
+        } else {
+            clsAddUserScreen.showAddUserScreen();
+        }
     }
-    private static void _ShowFindUsersListScreen(){
-        clsFindUserScreen.showFindUserScreen();
+
+    private static void _ShowFindUsersListScreen() {
+        if (TEST_MODE) {
+            System.out.println("TEST_MODE: _ShowFindUsersListScreen called");
+        } else {
+            clsFindUserScreen.showFindUserScreen();
+        }
     }
-    private static void _ShowDeleteUsersListScreen(){
-        clsDeleteUserScreen.showDeleteUserScreen();
+
+    private static void _ShowDeleteUsersListScreen() {
+        if (TEST_MODE) {
+            System.out.println("TEST_MODE: _ShowDeleteUsersListScreen called");
+        } else {
+            clsDeleteUserScreen.showDeleteUserScreen();
+        }
     }
+
     private static void _ShowLoginRegisterScreen() {
-        clsLoginRegisterScreen.showLoginRegisterScreen();
+        if (TEST_MODE) {
+            System.out.println("TEST_MODE: _ShowLoginRegisterScreen called");
+        } else {
+            clsLoginRegisterScreen.showLoginRegisterScreen();
+        }
     }
     private static void _GoBackToManageUsersMenu() {
         String pad = String.format("%37s", "");
@@ -112,4 +137,6 @@ public class clsManageUsersMenuScreen extends clsScreen{
         System.out.println(pad + "===========================================");
         _PerformManageUsersMenuOption(_ReadManageUsersMenuOption());
     }
+
+
 }

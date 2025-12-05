@@ -2,7 +2,12 @@ package aboodZaidLibrary;
 
 public class clsAdminCDsMenuScreen extends clsScreen {
 
-    private enum enCDAdminMenuOptions {
+    // -------------------------
+    // TEST MODE FLAG
+    // -------------------------
+    public static boolean TEST_MODE = false;
+
+    public enum enCDAdminMenuOptions {
         eList(1),
         eAdd(2),
         eFind(3),
@@ -14,6 +19,44 @@ public class clsAdminCDsMenuScreen extends clsScreen {
         public int getValue() { return value; }
     }
 
+    // -------------------------
+    // Show Screens (test-friendly)
+    // -------------------------
+    private static void _ShowCDsListScreen() {
+        if (TEST_MODE) {
+            System.out.print("list"); // marker for testing
+        } else {
+            clsCDsListScreen.showCDsListScreen();
+        }
+    }
+
+    private static void _ShowAddNewCDScreen() {
+        if (TEST_MODE) {
+            System.out.print("add"); // marker for testing
+        } else {
+            clsAddNewCDScreen.showAddNewCDScreen();
+        }
+    }
+
+    private static void _ShowFindCDScreen() {
+        if (TEST_MODE) {
+            System.out.print("find"); // marker for testing
+        } else {
+            clsFindCDScreen.showFindCDScreen();
+        }
+    }
+
+    private static void _ShowDeleteCDScreen() {
+        if (TEST_MODE) {
+            System.out.print("delete"); // marker for testing
+        } else {
+            clsDeleteCDScreen.showDeleteCDScreen();
+        }
+    }
+
+    // -------------------------
+    // Read option
+    // -------------------------
     private static enCDAdminMenuOptions _ReadCDAdminMenuOption() {
         String pad = String.format("%37s", "");
         System.out.print(pad + "Choose what do you want to do? [1 to 5]? ");
@@ -27,6 +70,9 @@ public class clsAdminCDsMenuScreen extends clsScreen {
         return enCDAdminMenuOptions.eBack;
     }
 
+    // -------------------------
+    // Go back
+    // -------------------------
     private static void _GoBack() {
         String pad = String.format("%37s", "");
         System.out.print(pad + "\nPress any key to go back...");
@@ -34,31 +80,34 @@ public class clsAdminCDsMenuScreen extends clsScreen {
         showCDAdminMenu();
     }
 
+    // -------------------------
+    // Perform option
+    // -------------------------
     private static void _PerformOption(enCDAdminMenuOptions option) {
         switch (option) {
 
             case eList:
                 System.out.print("\033[H\033[2J");
-                clsCDsListScreen.showCDsListScreen();
-                _GoBack();
+                _ShowCDsListScreen();
+                if (!TEST_MODE) _GoBack();  // skip _GoBack in tests
                 break;
 
             case eAdd:
                 System.out.print("\033[H\033[2J");
-                clsAddNewCDScreen.showAddNewCDScreen();
-                _GoBack();
+                _ShowAddNewCDScreen();
+                if (!TEST_MODE) _GoBack();
                 break;
 
             case eFind:
                 System.out.print("\033[H\033[2J");
-                clsFindCDScreen.showFindCDScreen();
-                _GoBack();
+                _ShowFindCDScreen();
+                if (!TEST_MODE) _GoBack();
                 break;
 
             case eDelete:
                 System.out.print("\033[H\033[2J");
-                clsDeleteCDScreen.showDeleteCDScreen();
-                _GoBack();
+                _ShowDeleteCDScreen();
+                if (!TEST_MODE) _GoBack();
                 break;
 
             case eBack:
@@ -66,6 +115,9 @@ public class clsAdminCDsMenuScreen extends clsScreen {
         }
     }
 
+    // -------------------------
+    // Show menu
+    // -------------------------
     public static void showCDAdminMenu() {
         System.out.print("\033[H\033[2J");
         System.out.flush();

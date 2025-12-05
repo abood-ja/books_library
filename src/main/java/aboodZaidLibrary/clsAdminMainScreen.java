@@ -18,7 +18,7 @@ public class clsAdminMainScreen extends clsScreen {
         public int getValue() { return value; }
     }
 
-    private static enMainMenuOptions _ReadMainMenuOption() {
+    public static enMainMenuOptions _ReadMainMenuOption() {
         String pad = String.format("%37s", "");
         System.out.print(pad + "Choose what do you want to do? [1 to 6]? ");
 

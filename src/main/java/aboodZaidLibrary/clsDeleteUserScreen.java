@@ -29,7 +29,7 @@ public class clsDeleteUserScreen extends clsScreen {
         clsUser user = clsUser.find(username);
         _PrintUser(user);
 
-        // ====== أهم خطوة ======
+
         if (!user.canBeDeleted()) {
             System.out.println("\n❌ Cannot delete user: They have unpaid fines or active/unreturned loans.");
             return;
