@@ -23,46 +23,54 @@ public class clsDate {
     }
     public clsDate(String sDate) {
         String[] vDate = sDate.split("/");
-        int day,month,year;
+        int day, month, year;
         try {
-             day = Integer.parseInt(vDate[0]);
+            day = Integer.parseInt(vDate[0]);
             month = Integer.parseInt(vDate[1]);
             year = Integer.parseInt(vDate[2]);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Day, month, and year must be valid integers. Given: " + sDate);
         }
-        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
-        if (day < 1 || day > maxDays) {
-            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
-        }
+
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
+
+        // Now get maxDays (this will not throw since we already validated)
+        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
+
+        if (day < 1 || day > maxDays) {
+            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
+        }
+
         _Day = day;
         _Month = month;
         _Year = year;
     }
-
     public clsDate(int day, int month, int year) {
-    	 int maxDays = clsDate.numberOfDaysInAMonth(month, year);
-         if (day < 1 || day > maxDays) {
-             throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
-         }
-         if (month < 1 || month > 12) {
-             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
-         }
-         if (year < 1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
-         }
-    	
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
+        }
+        if (year < 1) {
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
+
+        if (day < 1 || day > maxDays) {
+            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
+        }
+
         _Day = day;
         _Month = month;
         _Year = year;
     }
-
     public int getDay() {
         return _Day;
     }
@@ -148,38 +156,39 @@ public class clsDate {
 	{
 		return  numberOfDaysInAYear(_Year);
 	}
-	public static int numberOfHoursInAYear(int year)
-	{
-		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
-         }
-		return  numberOfDaysInAYear(year) * 24;
-	}
+    public static int numberOfHoursInAYear(int year) {
+        // Validate year FIRST, before calling numberOfDaysInAYear
+        if (year < 1) {
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+        }
+        return numberOfDaysInAYear(year) * 24;
+    }
+
 
 	public int numberOfHoursInAYear()
 	{
 		return  numberOfHoursInAYear(_Year);
 	}
-	public static int numberOfMinutesInAYear(int year)
-	{
-		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
-         }
-		return  numberOfHoursInAYear(year) * 60;
-	}
+    public static int numberOfMinutesInAYear(int year) {
+        // Validate year FIRST, before calling numberOfHoursInAYear
+        if (year < 1) {
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+        }
+        return numberOfHoursInAYear(year) * 60;
+    }
 
 	public int numberOfMinutesInAYear()
 	{
 		return  numberOfMinutesInAYear(_Year);
 	}
-	
-	public static int numberOfSecondsInAYear(int year)
-	{
-		 if (year<1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
-         }
-		return  numberOfMinutesInAYear(year) * 60;
-	}
+
+    public static int numberOfSecondsInAYear(int year) {
+        // Validate year FIRST, before calling numberOfMinutesInAYear
+        if (year < 1) {
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+        }
+        return numberOfMinutesInAYear(year) * 60;
+    }
 	
 	public int numberOfSecondsInAYear()
 	{
@@ -234,26 +243,30 @@ public class clsDate {
 	{
 		return  numberOfMinutesInAMonth(_Month, _Year) * 60;
 	}
-	
-	public static int dayOfWeekOrder(int day, int month, int year)
-	{
-		int maxDays = clsDate.numberOfDaysInAMonth(month, year);
-        if (day < 1 || day > maxDays) {
-            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
-        }
+
+    public static int dayOfWeekOrder(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
-		int a, y, m;
-		a = (14 - month) / 12;
-		y = year - a;
-		m = month + (12 * a) - 2;
-		
-		return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
-	}
+
+        // Now get maxDays (this will not throw since we already validated)
+        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
+
+        if (day < 1 || day > maxDays) {
+            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
+        }
+
+        int a, y, m;
+        a = (14 - month) / 12;
+        y = year - a;
+        m = month + (12 * a) - 2;
+
+        return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;
+    }
 
 	public int dayOfWeekOrder()
 	{
@@ -271,22 +284,26 @@ public class clsDate {
 
 	}
 
-	public static String dayShortName(int day, int month, int year)
-	{
-		int maxDays = clsDate.numberOfDaysInAMonth(month, year);
-        if (day < 1 || day > maxDays) {
-            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
-        }
+    public static String dayShortName(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
         }
         if (year < 1) {
-       	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
         }
-		String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
 
-		return arrDayNames[dayOfWeekOrder(day, month, year)];
-	}
+        // Now get maxDays (this will not throw since we already validated)
+        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
+
+        if (day < 1 || day > maxDays) {
+            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
+        }
+
+        String arrDayNames[] = { "Sun","Mon","Tue","Wed","Thu","Fri","Sat" };
+
+        return arrDayNames[dayOfWeekOrder(day, month, year)];
+    }
 
 	public String dayShortName()
 	{
@@ -375,27 +392,33 @@ public class clsDate {
             printMonthCalendar(i, _Year);
         }
     }
-	public static int daysFromTheBeginningOfTheYear(int day, int month, int year) {
-		 int maxDays = clsDate.numberOfDaysInAMonth(month, year);
-         if (day < 1 || day > maxDays) {
-             throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
-         }
-         if (month < 1 || month > 12) {
-             throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
-         }
-         if (year < 1) {
-        	 throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
-         }
-	    int totalDays = 0;
+    public static int daysFromTheBeginningOfTheYear(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12. Given: " + month);
+        }
+        if (year < 1) {
+            throw new IllegalArgumentException("Year must be bigger than  0. Given: " + year);
+        }
 
-	    for (int i = 1; i < month; i++) {
-	        totalDays += numberOfDaysInAMonth(i, year);
-	    }
+        // Now get maxDays (this will not throw since we already validated)
+        int maxDays = clsDate.numberOfDaysInAMonth(month, year);
 
-	    totalDays += day;
+        if (day < 1 || day > maxDays) {
+            throw new IllegalArgumentException("Day must be between 1 and " + maxDays + ". Given: " + day);
+        }
 
-	    return totalDays;
-	}
+        int totalDays = 0;
+
+        for (int i = 1; i < month; i++) {
+            totalDays += numberOfDaysInAMonth(i, year);
+        }
+
+        totalDays += day;
+
+        return totalDays;
+    }
+
 	public int daysFromTheBeginningOfTheYear() {
 	    int totalDays = 0;
 	    for (int i = 1; i < _Month; i++) {

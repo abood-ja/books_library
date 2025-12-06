@@ -3,6 +3,9 @@ package aboodZaidLibrary;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.*;
 import java.util.Vector;
 
@@ -316,6 +319,9 @@ class TestClsUser {
 
     // ===== registerLogin Test =====
 
+
+
+
     @Test
     void testRegisterLogin() {
         // Arrange
@@ -353,6 +359,257 @@ class TestClsUser {
         assertNotNull(records);
     }
 
+    // Add these tests to your TestClsUser class
+// These tests work with the existing backup system:
+// - @BeforeAll creates backups of Users.txt, LoginRegister.txt, Loans.txt
+// - @AfterEach restores files after each test
+// - @AfterAll cleans up backups at the end
+
+    @Test
+    void testSave_UpdateMode_Success() {
+        // Arrange - First create and save a user
+        String username = "updatetest_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setFirstName("Original");
+        user.setLastName("Name");
+        user.setPassword("pass123");
+        user.setPermissions(1);
+
+        clsUser.enSaveResults saveResult = user.save();
+        assertEquals(clsUser.enSaveResults.svSucceeded, saveResult);
+
+        // Act - Now find the user and update it
+        clsUser foundUser = clsUser.find(username);
+        assertFalse(foundUser.isEmpty());
+
+        // Modify the user
+        foundUser.setFirstName("Updated");
+        foundUser.setLastName("NewName");
+        foundUser.setPassword("newpass456");
+        foundUser.setPermissions(3);
+
+        // Save the update (this will call _Update())
+        clsUser.enSaveResults updateResult = foundUser.save();
+
+        // Assert
+        assertEquals(clsUser.enSaveResults.svSucceeded, updateResult);
+
+        // Verify the changes were saved
+        clsUser verifyUser = clsUser.find(username);
+        assertEquals("Updated", verifyUser.getFirstName());
+        assertEquals("NewName", verifyUser.getLastName());
+        assertEquals("newpass456", verifyUser.getPassword());
+        assertEquals(3, verifyUser.getPermissions());
+    }
+
+    @Test
+    void testSave_UpdateMode_UpdatesCorrectUser() {
+        // Arrange - Create multiple users
+        String username1 = "user1_" + System.currentTimeMillis();
+        String username2 = "user2_" + System.currentTimeMillis();
+
+        clsUser user1 = clsUser.GetAddNewUserObject(username1);
+        user1.setFirstName("User");
+        user1.setLastName("One");
+        user1.setPassword("pass1");
+        user1.save();
+
+        clsUser user2 = clsUser.GetAddNewUserObject(username2);
+        user2.setFirstName("User");
+        user2.setLastName("Two");
+        user2.setPassword("pass2");
+        user2.save();
+
+        // Act - Update user1
+        clsUser foundUser1 = clsUser.find(username1);
+        foundUser1.setFirstName("Modified");
+        foundUser1.save();
+
+        // Assert - Verify only user1 was updated
+        clsUser verifyUser1 = clsUser.find(username1);
+        assertEquals("Modified", verifyUser1.getFirstName());
+
+        clsUser verifyUser2 = clsUser.find(username2);
+        assertEquals("User", verifyUser2.getFirstName()); // Should remain unchanged
+        assertEquals("Two", verifyUser2.getLastName());
+    }
+
+    @Test
+    void testSave_AddNewMode_Success() {
+        // Arrange
+        String username = "newuser_" + System.currentTimeMillis();
+        clsUser newUser = clsUser.GetAddNewUserObject(username);
+        newUser.setFirstName("New");
+        newUser.setLastName("User");
+        newUser.setPassword("password");
+        newUser.setPermissions(2);
+
+        // Act
+        clsUser.enSaveResults result = newUser.save();
+
+        // Assert
+        assertEquals(clsUser.enSaveResults.svSucceeded, result);
+
+        // Verify user exists
+        assertTrue(clsUser.isUserExist(username));
+
+        // Verify user can be found
+        clsUser foundUser = clsUser.find(username);
+        assertFalse(foundUser.isEmpty());
+        assertEquals("New", foundUser.getFirstName());
+    }
+
+    @Test
+    void testSave_AddNewMode_UserAlreadyExists() {
+        // Arrange - Create a user first
+        String username = "duplicate_" + System.currentTimeMillis();
+        clsUser user1 = clsUser.GetAddNewUserObject(username);
+        user1.setPassword("pass1");
+        user1.save();
+
+        // Act - Try to create another user with same username
+        clsUser user2 = clsUser.GetAddNewUserObject(username);
+        user2.setPassword("pass2");
+        clsUser.enSaveResults result = user2.save();
+
+        // Assert
+        assertEquals(clsUser.enSaveResults.svFaildUserExists, result);
+    }
+
+    @Test
+    void testSave_EmptyMode_Fails() {
+        // Arrange - Create an empty user
+        clsUser emptyUser = new clsUser(
+                clsUser.enMode.EmptyMode,
+                "", "", "", "", "", "", 0
+        );
+
+        // Act
+        clsUser.enSaveResults result = emptyUser.save();
+
+        // Assert
+        assertEquals(clsUser.enSaveResults.svFaildEmptyObject, result);
+    }
+
+    @Test
+    void testFind_ByUsername_UserExists() {
+        // Arrange
+        String username = "findtest_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setFirstName("Find");
+        user.setLastName("Test");
+        user.setPassword("findpass");
+        user.setPermissions(1);
+        user.save();
+
+        // Act
+        clsUser foundUser = clsUser.find(username);
+
+        // Assert
+        assertFalse(foundUser.isEmpty());
+        assertEquals(username, foundUser.getUserName());
+        assertEquals("Find", foundUser.getFirstName());
+        assertEquals("Test", foundUser.getLastName());
+        assertEquals("findpass", foundUser.getPassword());
+    }
+
+
+    @Test
+    void testCanBeDeleted_NoLoansFile() throws IOException {
+        // Arrange
+        String username = "noloansfile_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setPassword("pass");
+        user.save();
+
+        // Backup Loans.txt if it exists
+        Path loansFile = Paths.get("Loans.txt");
+        Path loansBackup = Paths.get("Loans_TEMP_BACKUP.txt");
+        boolean loansExisted = Files.exists(loansFile);
+
+        if (loansExisted) {
+            Files.copy(loansFile, loansBackup, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // Delete Loans.txt to test the "no file" scenario
+            Files.deleteIfExists(loansFile);
+
+            // Act
+            boolean canDelete = user.canBeDeleted();
+
+            // Assert - Should return true when no Loans.txt exists
+            assertTrue(canDelete);
+
+        } finally {
+            // Restore Loans.txt if it existed
+            if (loansExisted && Files.exists(loansBackup)) {
+                Files.copy(loansBackup, loansFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // Clean up temp backup
+            Files.deleteIfExists(loansBackup);
+        }
+    }
+    @Test
+    void testFind_ByUsernameAndPassword_Success() {
+        // Arrange
+        String username = "authuser_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setPassword("correctpass");
+        user.save();
+
+        // Act
+        clsUser foundUser = clsUser.find(username, "correctpass");
+
+        // Assert
+        assertFalse(foundUser.isEmpty());
+        assertEquals(username, foundUser.getUserName());
+        assertEquals("correctpass", foundUser.getPassword());
+    }
+
+    @Test
+    void testIsUserExist_UserExists() {
+        // Arrange
+        String username = "existtest_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.save();
+
+        // Act & Assert
+        assertTrue(clsUser.isUserExist(username));
+    }
+
+    @Test
+    void testGetUsersList() {
+        // Arrange - Create a few users
+        String username1 = "listuser1_" + System.currentTimeMillis();
+        String username2 = "listuser2_" + System.currentTimeMillis();
+
+        clsUser user1 = clsUser.GetAddNewUserObject(username1);
+        user1.save();
+
+        clsUser user2 = clsUser.GetAddNewUserObject(username2);
+        user2.save();
+
+        // Act
+        Vector<clsUser> usersList = clsUser.getUsersList();
+
+        // Assert
+        assertNotNull(usersList);
+        assertTrue(usersList.size() >= 2);
+
+        // Verify our test users are in the list
+        boolean foundUser1 = false;
+        boolean foundUser2 = false;
+
+        for (clsUser u : usersList) {
+            if (u.getUserName().equals(username1)) foundUser1 = true;
+            if (u.getUserName().equals(username2)) foundUser2 = true;
+        }
+
+        assertTrue(foundUser1);
+        assertTrue(foundUser2);
+    }
     // ===== Fine Management Tests =====
 
     @Test
@@ -450,4 +707,92 @@ class TestClsUser {
         testUser.addFine(50.0);
         assertFalse(testUser.canBeDeleted());
     }
+
+
+
+
+
+    // ===== Delete Method Tests =====
+    @Test
+    void testDelete_User() {
+        // Arrange
+        clsUser user = clsUser.GetAddNewUserObject("deletetest_" + System.currentTimeMillis());
+        user.setPassword("pass");
+        user.save();
+
+        // Act
+        boolean deleted = user.delete();
+
+        // Assert
+        assertTrue(deleted);
+        assertTrue(user.isEmpty()); // object reset
+        assertFalse(clsUser.isUserExist(user.getUserName())); // removed from file
+    }
+
+    // ===== hasOverdue Tests with actual loans =====
+    @Test
+    void testHasOverdue_OverdueLoan() throws IOException {
+        String username = "overdueuser_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setPassword("pass");
+        user.save();
+
+        // Create Loans.txt with one overdue book
+        Path loans = Paths.get("Loans.txt");
+        String line = "ISBN123#//#" + username + "#//#2025-11-01#//#2025-11-05#//#false"; // due in past
+        Files.write(loans, line.getBytes());
+
+        // Act
+        boolean overdue = user.hasOverdue();
+
+        // Assert
+        assertTrue(overdue);
+
+        // Cleanup
+        Files.deleteIfExists(loans);
+    }
+
+    @Test
+    void testHasOverdue_ReturnedLoan() throws IOException {
+        String username = "returneduser_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setPassword("pass");
+        user.save();
+
+        // Create Loans.txt with returned loan
+        Path loans = Paths.get("Loans.txt");
+        String line = "ISBN123#//#" + username + "#//#2025-11-01#//#2025-11-05#//#true"; // already returned
+        Files.write(loans, line.getBytes());
+
+        // Act
+        boolean overdue = user.hasOverdue();
+
+        // Assert
+        assertFalse(overdue);
+
+        Files.deleteIfExists(loans);
+    }
+
+    // ===== canBeDeleted Tests with active loans =====
+    @Test
+    void testCanBeDeleted_WithActiveLoan() throws IOException {
+        String username = "activeuser_" + System.currentTimeMillis();
+        clsUser user = clsUser.GetAddNewUserObject(username);
+        user.setPassword("pass");
+        user.save();
+
+        // Add a loan not returned
+        Path loans = Paths.get("Loans.txt");
+        String line = "ISBN123#//#" + username + "#//#2025-11-01#//#2025-12-01#//#false";
+        Files.write(loans, line.getBytes());
+
+        // Act
+        boolean canDelete = user.canBeDeleted();
+
+        // Assert
+        assertFalse(canDelete);
+
+        Files.deleteIfExists(loans);
+    }
+
 }

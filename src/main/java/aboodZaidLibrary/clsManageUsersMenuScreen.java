@@ -38,43 +38,28 @@ public class clsManageUsersMenuScreen extends clsScreen{
         return null;
     }
     private static void _ShowUsersListScreen() {
-        if (TEST_MODE) {
-            System.out.println("TEST_MODE: _ShowUsersListScreen called");
-        } else {
             clsUserListScreen.showUserListScreen();
-        }
     }
 
-    private static void _ShowAddUsersListScreen() {
-        if (TEST_MODE) {
-            System.out.println("TEST_MODE: _ShowAddUsersListScreen called");
-        } else {
-            clsAddUserScreen.showAddUserScreen();
-        }
+    private static void _ShowAddUsersListScreen() {clsAddUserScreen.showAddUserScreen();
     }
 
     private static void _ShowFindUsersListScreen() {
-        if (TEST_MODE) {
-            System.out.println("TEST_MODE: _ShowFindUsersListScreen called");
-        } else {
+
             clsFindUserScreen.showFindUserScreen();
-        }
+
     }
 
     private static void _ShowDeleteUsersListScreen() {
-        if (TEST_MODE) {
-            System.out.println("TEST_MODE: _ShowDeleteUsersListScreen called");
-        } else {
+
             clsDeleteUserScreen.showDeleteUserScreen();
-        }
+
     }
 
     private static void _ShowLoginRegisterScreen() {
-        if (TEST_MODE) {
-            System.out.println("TEST_MODE: _ShowLoginRegisterScreen called");
-        } else {
+
             clsLoginRegisterScreen.showLoginRegisterScreen();
-        }
+
     }
     private static void _GoBackToManageUsersMenu() {
         String pad = String.format("%37s", "");

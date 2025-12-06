@@ -88,6 +88,28 @@ class TestClsPayFineScreen {
     }
 
     @Test
+    void testBookFinePaymentY() throws IOException {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        String loanLine = "ISBN123#//#testuser#//#Book Title#//#" + yesterday + "#//#false";
+
+        // Write loan line safely
+        Files.write(LOANS_FILE, loanLine.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        // Simulate user input 'y'
+        clsInputValidate.setTestScanner(new java.util.Scanner("Y\n"));
+
+        clsPayFineScreen.showPayFineScreen();
+        String output = outContent.toString();
+        assertTrue(output.contains("Unpaid Fines"));
+        assertTrue(output.contains("✔ All fines paid successfully"));
+
+        // Check that the loan line was updated to 'true'
+        String updatedLine = Files.readAllLines(LOANS_FILE).get(0);
+        assertTrue(updatedLine.endsWith("true"));
+    }
+
+
+    @Test
     void testCDFinePayment() throws IOException {
         LocalDate yesterday = LocalDate.now().minusDays(2);
         String loanLine = "CD-001#//#CD Title#//#testuser#//#other#//#" + yesterday + "#//#false";

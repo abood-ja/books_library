@@ -68,6 +68,38 @@ class TestClsBook {
     }
 
     @Test
+    void testSave_SuccessfullySavesBookToFile() {
+        // This will trigger _SaveBooksDataToFile and execute the write lines
+        clsBook book = clsBook.GetAddNewBookObject("ISBN001");
+        book.setTitle("Save Test Title");
+        book.setAuthor("Save Test Author");
+
+        clsBook.enSaveResults result = book.save();
+
+        assertEquals(clsBook.enSaveResults.svSucceeded, result);
+
+        // Verify it was saved
+        clsBook foundBook = clsBook.findBookByISBN("ISBN001");
+        assertFalse(foundBook.isEmpty());
+        assertEquals("Save Test Title", foundBook.getTitle());
+    }
+
+    @Test
+    void testDelete_TriggersSaveToFile() {
+        // First create and save a book
+        clsBook book = clsBook.GetAddNewBookObject("ISBN_DELETE001");
+        book.setTitle("Delete Test");
+        book.setAuthor("Delete Author");
+        book.save();
+
+        // Now delete it - this will trigger _SaveBooksDataToFile
+        book.delete();
+
+        // Verify it was deleted
+        clsBook foundBook = clsBook.findBookByISBN("ISBN_DELETE001");
+        assertTrue(foundBook.isEmpty());
+    }
+    @Test
     void testSave_AddNewBook_Success() {
         clsBook book = clsBook.GetAddNewBookObject("ISBN002");
         book.setTitle("Book Title");

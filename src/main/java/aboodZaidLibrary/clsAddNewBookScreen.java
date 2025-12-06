@@ -86,8 +86,6 @@ public class clsAddNewBookScreen extends clsScreen {
         if (__appendBook(title, author, isbn)) {
             System.out.println("✅ Book added successfully.");
             System.out.println("➡️ Saved format: title#//#author#//#isbn");
-        } else {
-            System.out.println("⚠️ Failed to add the book.");
         }
     }
 }

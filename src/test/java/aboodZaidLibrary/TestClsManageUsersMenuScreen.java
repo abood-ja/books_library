@@ -79,35 +79,7 @@ class TestClsManageUsersMenuScreen {
         method.setAccessible(true);
         method.invoke(null);
     }
-    @Test
-    void test_ShowUsersListScreen() throws Exception {
-        invokePrivateMethod("_ShowUsersListScreen");
-        assertTrue(outputStream.toString().contains("_ShowUsersListScreen called"));
-    }
 
-    @Test
-    void test_ShowAddUsersListScreen() throws Exception {
-        invokePrivateMethod("_ShowAddUsersListScreen");
-        assertTrue(outputStream.toString().contains("_ShowAddUsersListScreen called"));
-    }
-
-    @Test
-    void test_ShowFindUsersListScreen() throws Exception {
-        invokePrivateMethod("_ShowFindUsersListScreen");
-        assertTrue(outputStream.toString().contains("_ShowFindUsersListScreen called"));
-    }
-
-    @Test
-    void test_ShowDeleteUsersListScreen() throws Exception {
-        invokePrivateMethod("_ShowDeleteUsersListScreen");
-        assertTrue(outputStream.toString().contains("_ShowDeleteUsersListScreen called"));
-    }
-
-    @Test
-    void test_ShowLoginRegisterScreen() throws Exception {
-        invokePrivateMethod("_ShowLoginRegisterScreen");
-        assertTrue(outputStream.toString().contains("_ShowLoginRegisterScreen called"));
-    }
 
     @Test
     void test_GoBackToManageUsersMenu_printPrompt() throws Exception {
@@ -131,5 +103,38 @@ class TestClsManageUsersMenuScreen {
         assertTrue(output.contains("Press any key to go back to Books Menu..."));
     }
 
+
+    @Test
+    void test_ShowManageUsersMenu_NoAccess() throws Exception {
+        // User without permission
+        clsUserSession.currentUser = new clsUser(
+                clsUser.enMode.AddNewMode,
+                "John",
+                "Doe",
+                "john@example.com",
+                "12345678",
+                "johndoe",
+                "password123",
+                0 // no permissions
+        );
+
+        // Capture console output
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        try {
+            clsManageUsersMenuScreen.showManageUsersMenu();
+            String output = outputStream.toString();
+
+            // Assert that the menu title is NOT printed
+            assertFalse(output.contains("Manage Users Menu"),
+                    "Expected menu not to be shown for user without permission");
+
+        } finally {
+            System.setOut(originalOut);
+            clsUserSession.currentUser = null;
+        }
+    }
 
 }

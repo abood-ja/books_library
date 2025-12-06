@@ -171,7 +171,7 @@ public class clsUserBooksMenuScreen extends clsScreen {
         clsPayFineScreen.showPayFineScreen();
     }
 
-    private enum enBooksMenuOptions {
+    public enum enBooksMenuOptions {
         eBooksList(1),
         eBorrowBook(2),
         eFindBook(3),

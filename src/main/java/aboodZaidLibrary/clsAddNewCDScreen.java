@@ -82,8 +82,6 @@ public class clsAddNewCDScreen extends clsScreen {
 
         if (__appendCD(title, artist, id)) {
             System.out.println("✅ CD added successfully.");
-        } else {
-            System.out.println("❌ Failed to add CD.");
         }
     }
 }

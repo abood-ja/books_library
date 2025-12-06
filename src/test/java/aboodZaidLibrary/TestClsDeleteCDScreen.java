@@ -87,7 +87,7 @@ class TestClsDeleteCDScreen {
     }
 
     @Test
-    void test_showDeleteCDScreen_WithAccess_ConfirmYes() throws Exception {
+    void test_showDeleteCDScreen_WithAccess_Confirmyes() throws Exception {
         // 1. Backup the file
         File cdsFile = new File("CDs.txt");
         File backupFile = new File("CDs_backup.txt");
@@ -119,6 +119,69 @@ class TestClsDeleteCDScreen {
 
             // 5. Simulate user input: CD ID, then 'y' to confirm
             String simulatedInput = "soft1234\ny\n";
+            Scanner testScanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
+            clsInputValidate.setTestScanner(testScanner);
+
+            // 6. Call the method
+            clsDeleteCDScreen.showDeleteCDScreen();
+
+            // 7. Capture output and assert
+            String output = outputStream.toString();
+            assertTrue(output.contains("CD Details:"));
+            assertTrue(output.contains("Title   : soft"));
+            assertTrue(output.contains("Artist  : zaid"));
+            assertTrue(output.contains("CD ID   : soft1234"));
+            assertTrue(output.contains("CD Deleted Successfully"));
+
+            // 8. Verify the CD was deleted
+            String fileContent = String.join("\n", Files.readAllLines(cdsFile.toPath()));
+            assertFalse(fileContent.contains("soft#//#zaid#//#soft1234"));
+
+        } finally {
+            // Reset test scanner
+            clsInputValidate.setTestScanner(null);
+
+            // Restore original file
+            if (backupFile.exists()) {
+                Files.copy(backupFile.toPath(), cdsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                backupFile.delete();
+            }
+        }
+    }
+
+    @Test
+    void test_showDeleteCDScreen_WithAccess_ConfirmYes() throws Exception {
+        // 1. Backup the file
+        File cdsFile = new File("CDs.txt");
+        File backupFile = new File("CDs_backup.txt");
+        if (cdsFile.exists()) {
+            Files.copy(cdsFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // 2. Empty the file
+            PrintWriter writer = new PrintWriter(cdsFile);
+            writer.close();
+
+            // 3. Add a test CD line (simulate storage)
+            try (FileWriter fw = new FileWriter(cdsFile, true)) {
+                fw.write("soft#//#zaid#//#soft1234\n");
+            }
+
+            // 4. Create a user with delete permission
+            clsUserSession.currentUser = new clsUser(
+                    clsUser.enMode.AddNewMode,
+                    "Test",
+                    "User",
+                    "test@example.com",
+                    "1234567890",
+                    "testuser",
+                    "password",
+                    clsUser.enPermissions.pDeleteBook.getValue()
+            );
+
+            // 5. Simulate user input: CD ID, then 'y' to confirm
+            String simulatedInput = "soft1234\nY\n";
             Scanner testScanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
             clsInputValidate.setTestScanner(testScanner);
 
@@ -206,6 +269,80 @@ class TestClsDeleteCDScreen {
             clsInputValidate.setTestScanner(null);
 
             // Restore original file
+            if (backupFile.exists()) {
+                Files.copy(backupFile.toPath(), cdsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                backupFile.delete();
+            }
+        }
+    }
+
+    @Test
+    void test_showDeleteCDScreen_WithAccess_WrongThenCorrectID_ConfirmYes() throws Exception {
+
+        File cdsFile = new File("CDs.txt");
+        File backupFile = new File("CDs_backup.txt");
+        if (cdsFile.exists()) {
+            Files.copy(cdsFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // Empty the file
+            new PrintWriter(cdsFile).close();
+
+            // Add a single CD
+            try (FileWriter fw = new FileWriter(cdsFile, true)) {
+                fw.write("soft#//#zaid#//#soft1234\n");
+            }
+
+            // User with permission
+            clsUserSession.currentUser = new clsUser(
+                    clsUser.enMode.AddNewMode,
+                    "Test",
+                    "User",
+                    "test@example.com",
+                    "1234567890",
+                    "testuser",
+                    "password",
+                    clsUser.enPermissions.pDeleteBook.getValue()
+            );
+
+            // WRONG id → "_____"
+            // then correct id → "soft1234"
+            // then confirm → "y"
+            String simulatedInput = "_____\nsoft1234\ny\n";
+            clsInputValidate.setTestScanner(
+                    new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()))
+            );
+
+            // Call method
+            clsDeleteCDScreen.showDeleteCDScreen();
+
+            // Capture output
+            String output = outputStream.toString();
+
+            // ✅ Check the WRONG ID message printed from the while loop
+            assertTrue(
+                    output.contains("CD not found, enter another one"),
+                    "Expected message when entering wrong CD ID"
+            );
+
+            // Check CD details printed after correct ID
+            assertTrue(output.contains("CD Details:"));
+            assertTrue(output.contains("Title"));
+            assertTrue(output.contains("soft"));
+            assertTrue(output.contains("zaid"));
+            assertTrue(output.contains("soft1234"));
+
+            // Confirm 'y' deletion message
+            assertTrue(output.contains("CD Deleted Successfully"));
+
+            // Verify CD was deleted
+            String fileContent = String.join("\n", Files.readAllLines(cdsFile.toPath()));
+            assertFalse(fileContent.contains("soft#//#zaid#//#soft1234"));
+
+        } finally {
+            clsInputValidate.setTestScanner(null);
+
             if (backupFile.exists()) {
                 Files.copy(backupFile.toPath(), cdsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 backupFile.delete();

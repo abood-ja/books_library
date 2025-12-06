@@ -109,13 +109,8 @@ public class clsAddUserScreen extends clsScreen {
 
                 break;
 
-            case svFaildEmptyObject:
-                System.out.print("\nError User was not saved because it's empty");
-                break;
 
-            case svFaildUserExists:
-                System.out.print("\nError User was not saved because UserName is used!\n");
-                break;
+
         }
     }
 

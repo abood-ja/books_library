@@ -5,7 +5,7 @@ import java.util.*;
 
 public class clsAdminMainScreen extends clsScreen {
 
-    private enum enMainMenuOptions {
+    public enum enMainMenuOptions {
         eBooks(1),
         eCDs(2),
         eManageUsers(3),
@@ -30,10 +30,7 @@ public class clsAdminMainScreen extends clsScreen {
 
         return enMainMenuOptions.eLogout;
     }
-
-    // ======================= SUB-MENUS =========================
-
-    private static void _ShowBooksMenu() {
+    static void _ShowBooksMenu() {
         clsAdminBooksMenuScreen.showBooksMenu();
     }
 
@@ -101,12 +98,14 @@ public class clsAdminMainScreen extends clsScreen {
         clsUserSession.currentUser = clsUser.find("", "");
     }
 
-    private static void _GoBackToMainMenu() {
+    static void _GoBackToMainMenu() {
         String pad = String.format("%37s", "");
         System.out.print(pad + "\nPress any key to go back to Main Menu...");
         new java.util.Scanner(System.in).nextLine();
         showMainMenu();
     }
+
+
 
     // ======================= PERFORM OPTION =========================
 

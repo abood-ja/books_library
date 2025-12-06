@@ -145,6 +145,70 @@ class TestClsDeleteBookScreen {
     }
 
     @Test
+    void test_showDeleteBookScreen_WithAccessY() throws Exception {
+        // 1. Backup the file
+        File booksFile = new File("Books.txt");
+        File backupFile = new File("Books_backup.txt");
+        if (booksFile.exists()) {
+            Files.copy(booksFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // 2. Empty the file
+            PrintWriter writer = new PrintWriter(booksFile);
+            writer.close();
+
+            // 3. Add a test book line
+            try (FileWriter fw = new FileWriter(booksFile, true)) {
+                fw.write("soft#//#zaid#//#soft1234\n");
+            }
+
+            // 4. Create a user with delete permission
+            clsUserSession.currentUser = new clsUser(
+                    clsUser.enMode.AddNewMode,
+                    "Test",
+                    "User",
+                    "test@example.com",
+                    "1234567890",
+                    "testuser",
+                    "password",
+                    clsUser.enPermissions.pDeleteBook.getValue()
+            );
+
+            // 5. Use a test Scanner for simulated input
+            String simulatedInput = "soft1234\nY\n"; // ISPN line, then confirmation line
+            Scanner testScanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
+            clsInputValidate.setTestScanner(testScanner);
+
+            // 6. Call the method
+            clsDeleteBookScreen.showDeleteBookScreen();
+
+            // 7. Capture output
+            String output = outputStream.toString();
+            assertTrue(output.contains("Book Details:"));
+            assertTrue(output.contains("Book Title  : soft"));
+            assertTrue(output.contains("Book Author : zaid"));
+            assertTrue(output.contains("Book ISPN   : soft1234"));
+            assertTrue(output.contains("Book Deleted Successfully"));
+
+            // 8. Verify the book was deleted
+            String fileContent = String.join("\n", Files.readAllLines(booksFile.toPath()));
+            assertFalse(fileContent.contains("soft#//#zaid#//#soft1234"));
+
+        } finally {
+            // Reset test scanner
+            clsInputValidate.setTestScanner(null);
+
+            // Restore original file
+            if (backupFile.exists()) {
+                Files.copy(backupFile.toPath(), booksFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                backupFile.delete();
+            }
+        }
+    }
+
+
+    @Test
     void test_showDeleteBookScreen_WithAccess_AnswerNo() throws Exception {
         // 1. Backup the file
         File booksFile = new File("Books.txt");
@@ -200,6 +264,64 @@ class TestClsDeleteBookScreen {
             clsInputValidate.setTestScanner(null);
 
             // Restore original file
+            if (backupFile.exists()) {
+                Files.copy(backupFile.toPath(), booksFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                backupFile.delete();
+            }
+        }
+    }
+
+
+    @Test
+    void test_showDeleteBookScreen_WrongThenCorrectISPN() throws Exception {
+        // 1. Backup the file
+        File booksFile = new File("Books.txt");
+        File backupFile = new File("Books_backup.txt");
+        if (booksFile.exists()) {
+            Files.copy(booksFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // 2. Empty the file and add a single book
+            PrintWriter writer = new PrintWriter(booksFile);
+            writer.close();
+            try (FileWriter fw = new FileWriter(booksFile, true)) {
+                fw.write("wq#//#wq#//#11\n");
+            }
+
+            // 3. Create a user with delete permission
+            clsUserSession.currentUser = new clsUser(
+                    clsUser.enMode.AddNewMode,
+                    "Test",
+                    "User",
+                    "test@example.com",
+                    "1234567890",
+                    "testuser",
+                    "password",
+                    clsUser.enPermissions.pDeleteBook.getValue()
+            );
+
+            // 4. Simulate input: first wrong ISPN '12', then correct '11', then 'y'
+            String simulatedInput = "12\n11\ny\n";
+            Scanner testScanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
+            clsInputValidate.setTestScanner(testScanner);
+
+            // 5. Call method
+            clsDeleteBookScreen.showDeleteBookScreen();
+
+            // 6. Capture output
+            String output = outputStream.toString();
+            assertTrue(output.contains("ISPN is not found, enter another one"));
+            assertTrue(output.contains("Book Deleted Successfully"));
+
+            // 7. Verify the book was deleted
+            String fileContent = String.join("\n", Files.readAllLines(booksFile.toPath()));
+            assertFalse(fileContent.contains("wq#//#wq#//#11"));
+
+        } finally {
+            clsInputValidate.setTestScanner(null);
+
+            // 8. Restore original file
             if (backupFile.exists()) {
                 Files.copy(backupFile.toPath(), booksFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 backupFile.delete();

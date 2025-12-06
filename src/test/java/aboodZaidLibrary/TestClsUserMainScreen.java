@@ -1,11 +1,14 @@
 package aboodZaidLibrary;
 
 import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
 import java.io.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 class TestClsUserMainScreen {
 
@@ -19,10 +22,7 @@ class TestClsUserMainScreen {
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        // Set TEST_MODE = true before each test
-        Field testModeField = clsUserMainScreen.class.getDeclaredField("TEST_MODE");
-        testModeField.setAccessible(true);
-        testModeField.setBoolean(null, true); // static field → null instance
+        // Set a dummy current user
         clsUserSession.currentUser = new clsUser(
                 clsUser.enMode.AddNewMode,
                 "Test",
@@ -36,11 +36,11 @@ class TestClsUserMainScreen {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         System.setOut(originalOut);
-        clsUserSession.currentUser = null; // clean up
+        System.setIn(originalIn);
+        clsUserSession.currentUser = null;
     }
-
 
     private String invokePrivateMethod(String methodName) throws Exception {
         Method method = clsUserMainScreen.class.getDeclaredMethod(methodName);
@@ -50,66 +50,64 @@ class TestClsUserMainScreen {
     }
 
     @Test
-    void test_ShowBooksMenu() throws Exception {
-        String output = invokePrivateMethod("_ShowBooksMenu");
-        assertEquals("[TEST_MODE] _ShowBooksMenu called", output);
+    void testShowMainMenuPrintsExpectedOutput() throws Exception {
+        System.setIn(new ByteArrayInputStream("4\n".getBytes())); // simulate "Logout"
+        clsUserMainScreen.showMainMenu();
+        String output = outputStream.toString();
+        assertTrue(output.contains("User Main Menu"));
+        assertTrue(output.contains("[1] Books Menu."));
+        assertTrue(output.contains("[2] CDs Menu."));
+        assertTrue(output.contains("[3] Pay Fines."));
+        assertTrue(output.contains("[4] Logout."));
+        assertTrue(output.contains("==========================================="));
     }
 
-    @Test
-    void test_ShowCDsMenu() throws Exception {
-        String output = invokePrivateMethod("_ShowCDsMenu");
-        assertEquals("[TEST_MODE] _ShowCDsMenu called", output);
-    }
 
-    @Test
-    void test_ShowPayFinesScreen() throws Exception {
-        String output = invokePrivateMethod("_ShowPayFinesScreen");
-        assertEquals("[TEST_MODE] _ShowPayFinesScreen called", output);
-    }
+
+
+
+
+
     @Test
     void test_ReadMainMenuOption_validInput1() throws Exception {
-        // Simulate user typing "1" and pressing Enter
-        String simulatedInput = "1\n";
-        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
-
-        // Access private static method via reflection
+        System.setIn(new ByteArrayInputStream("1\n".getBytes()));
         Method method = clsUserMainScreen.class.getDeclaredMethod("_ReadMainMenuOption");
         method.setAccessible(true);
-
-        Object result = method.invoke(null); // static method → null instance
+        Object result = method.invoke(null);
         assertEquals(clsUserMainScreen.enMainMenuOptions.eBooksMenu, result);
     }
 
     @Test
     void test_ReadMainMenuOption_validInput4() throws Exception {
-        // Simulate user typing "4" and pressing Enter
-        String simulatedInput = "4\n";
-        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
-
+        System.setIn(new ByteArrayInputStream("4\n".getBytes()));
         Method method = clsUserMainScreen.class.getDeclaredMethod("_ReadMainMenuOption");
         method.setAccessible(true);
-
         Object result = method.invoke(null);
         assertEquals(clsUserMainScreen.enMainMenuOptions.eLogout, result);
     }
 
-
     @Test
     void test_Logout_resetsCurrentUser() throws Exception {
-        // Ensure currentUser is not null before logout
-        assertNotNull(clsUserSession.currentUser);
+        clsUserSession.currentUser = new clsUser(
+                clsUser.enMode.AddNewMode,
+                "Test",
+                "User",
+                "test@example.com",
+                "1234567890",
+                "testuser",
+                "password",
+                -1
+        );
 
-        // Call private static _Logout()
         Method logoutMethod = clsUserMainScreen.class.getDeclaredMethod("_Logout");
         logoutMethod.setAccessible(true);
-        logoutMethod.invoke(null); // static method → null instance
+        logoutMethod.invoke(null);
 
-        // Check that currentUser is now null
-        assertNull(clsUserSession.currentUser, "currentUser should be null after _Logout()");
+        clsUser expectedUser = clsUser.find("", "");
+        assertEquals(expectedUser.getUserName(), clsUserSession.currentUser.getUserName());
+        assertEquals(expectedUser.getFirstName(), clsUserSession.currentUser.getFirstName());
+        assertEquals(expectedUser.getLastName(), clsUserSession.currentUser.getLastName());
+        assertEquals(expectedUser.getEmail(), clsUserSession.currentUser.getEmail());
+        assertEquals(expectedUser.getPhone(), clsUserSession.currentUser.getPhone());
     }
-
-
-
-
-
 }

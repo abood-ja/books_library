@@ -1285,7 +1285,1188 @@ static clsDate date;
         assertTrue(clsDate.isDate1BeforeDate2(date1, date2));
     }
 
+    // ============== Tests for isDate1BeforeDate2 - Missing branches ==============
 
+    @Test
+    void testIsDate1BeforeDate2_SameYear_Date1MonthGreater() {
+        // Tests the false branch when years are equal but date1.month > date2.month
+        clsDate date1 = new clsDate(1, 6, 2023);
+        clsDate date2 = new clsDate(1, 5, 2023);
+
+        assertFalse(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_SameYearAndMonth_Date1DayGreater() {
+        // Tests the false branch when year and month are equal but date1.day > date2.day
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(10, 6, 2023);
+
+        assertFalse(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_Date1YearGreater() {
+        // Tests the false branch when date1.year > date2.year
+        clsDate date1 = new clsDate(1, 1, 2024);
+        clsDate date2 = new clsDate(1, 1, 2023);
+
+        assertFalse(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    // ============== Tests for isDate1EqualDate2 - Missing branches ==============
+
+    @Test
+    void testIsDate1EqualDate2_SameYear_DifferentMonth() {
+        // Tests false branch when years equal but months differ
+        clsDate date1 = new clsDate(1, 5, 2023);
+        clsDate date2 = new clsDate(1, 6, 2023);
+
+        assertFalse(clsDate.isDate1EqualDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1EqualDate2_SameYearAndMonth_DifferentDay() {
+        // Tests false branch when year and month equal but days differ
+        clsDate date1 = new clsDate(10, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+
+        assertFalse(clsDate.isDate1EqualDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1EqualDate2_DifferentYear() {
+        // Tests false branch when years differ
+        clsDate date1 = new clsDate(1, 1, 2022);
+        clsDate date2 = new clsDate(1, 1, 2023);
+
+        assertFalse(clsDate.isDate1EqualDate2(date1, date2));
+    }
+
+    // ============== Tests for getDifferenceInDays - Swap flag branches ==============
+
+    @Test
+    void testGetDifferenceInDays_Date1AfterDate2_SwapFlagActivated() {
+        // Tests the swap branch when date1 is after date2
+        // This ensures swapFlag = -1 branch is covered
+        clsDate date1 = new clsDate(10, 1, 2023);
+        clsDate date2 = new clsDate(1, 1, 2023);
+
+        int difference = clsDate.getDifferenceInDays(date1, date2);
+
+        assertEquals(-9, difference);
+    }
+
+    @Test
+    void testGetDifferenceInDays_Date2AfterDate1_NoSwap() {
+        // Tests the normal case where date1 is before date2
+        // This ensures swapFlag = 1 branch is covered
+        clsDate date1 = new clsDate(1, 1, 2023);
+        clsDate date2 = new clsDate(10, 1, 2023);
+
+        int difference = clsDate.getDifferenceInDays(date1, date2);
+
+        assertEquals(9, difference);
+    }
+
+    // ============== Tests for addDays - Month wraparound branches ==============
+
+    @Test
+    void testAddDays_WrapsToNextYear() {
+        // Tests the branch where _Month > 12 and wraps to next year
+        clsDate date = new clsDate(15, 12, 2023);
+        date.addDays(30); // Should go into January 2024
+
+        assertEquals(14, date.getDay());
+        assertEquals(1, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    @Test
+    void testAddDays_StaysInSameMonth() {
+        // Tests the else branch where remainingDays <= monthDays
+        clsDate date = new clsDate(1, 6, 2023);
+        date.addDays(5);
+
+        assertEquals(6, date.getDay());
+        assertEquals(6, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testAddDays_ExactlyEndOfMonth() {
+        // Tests boundary condition
+        clsDate date = new clsDate(1, 1, 2023);
+        date.addDays(30); // Should be exactly Jan 31
+
+        assertEquals(31, date.getDay());
+        assertEquals(1, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    // ============== Tests for getDateFromDayOrderInYear - Branch coverage ==============
+
+    @Test
+    void testGetDateFromDayOrderInYear_FirstDayOfYear() {
+        // Tests minimal case
+        clsDate date = clsDate.getDateFromDayOrderInYear(1, 2023);
+
+        assertEquals(1, date.getDay());
+        assertEquals(1, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_MidYear() {
+        // Tests loop continues through multiple months
+        clsDate date = clsDate.getDateFromDayOrderInYear(100, 2023);
+
+        assertEquals(10, date.getDay());
+        assertEquals(4, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_LeapYearDay60() {
+        // Tests leap year February 29
+        clsDate date = clsDate.getDateFromDayOrderInYear(60, 2024);
+
+        assertEquals(29, date.getDay());
+        assertEquals(2, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    // ============== Tests for numberOfDaysInAMonth - February branches ==============
+
+    @Test
+    void testNumberOfDaysInAMonth_FebruaryLeapYear() {
+        // Tests (month == 2) && isLeapYear(year) branch
+        int days = clsDate.numberOfDaysInAMonth(2, 2024);
+        assertEquals(29, days);
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_FebruaryNonLeapYear() {
+        // Tests (month == 2) && !isLeapYear(year) branch
+        int days = clsDate.numberOfDaysInAMonth(2, 2023);
+        assertEquals(28, days);
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_NotFebruary() {
+        // Tests else branch where month != 2
+        int days = clsDate.numberOfDaysInAMonth(7, 2023);
+        assertEquals(31, days);
+    }
+
+    // ============== Tests for isLeapYear - All branches ==============
+
+    @Test
+    void testIsLeapYear_DivisibleBy400() {
+        // Tests (year % 400 == 0) branch - true
+        assertTrue(clsDate.isLeapYear(2000));
+        assertTrue(clsDate.isLeapYear(1600));
+    }
+
+    @Test
+    void testIsLeapYear_DivisibleBy100ButNot400() {
+        // Tests (year % 100 == 0) but not (year % 400 == 0) - false
+        assertFalse(clsDate.isLeapYear(1900));
+        assertFalse(clsDate.isLeapYear(2100));
+    }
+
+    @Test
+    void testIsLeapYear_DivisibleBy4ButNot100() {
+        // Tests (year % 4 == 0 && year % 100 != 0) - true
+        assertTrue(clsDate.isLeapYear(2024));
+        assertTrue(clsDate.isLeapYear(2004));
+    }
+
+    @Test
+    void testIsLeapYear_NotDivisibleBy4() {
+        // Tests default false case
+        assertFalse(clsDate.isLeapYear(2023));
+        assertFalse(clsDate.isLeapYear(2019));
+    }
+
+    // ============== Tests for dayOfWeekOrder calculation branches ==============
+
+    @Test
+    void testDayOfWeekOrder_February() {
+        // Tests month < 3 branch affecting the calculation
+        int order = clsDate.dayOfWeekOrder(15, 2, 2023);
+        assertEquals(3, order); // Wednesday
+    }
+
+    @Test
+    void testDayOfWeekOrder_March() {
+        // Tests month >= 3 branch
+        int order = clsDate.dayOfWeekOrder(1, 3, 2023);
+        assertEquals(3, order); // Wednesday
+    }
+
+    // ============== Edge cases for constructors ==============
+
+    @Test
+    void testClsDateConstructor_String_LeapYearFeb29() {
+        // Valid leap year date
+        clsDate date = new clsDate("29/2/2024");
+        assertEquals(29, date.getDay());
+        assertEquals(2, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidLeapYearFeb29() {
+        // Invalid Feb 29 in non-leap year
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("29/2/2023");
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testClsDateConstructor_DayMonthYear_LeapYearFeb29() {
+        // Valid leap year date
+        clsDate date = new clsDate(29, 2, 2024);
+        assertEquals(29, date.getDay());
+    }
+
+    @Test
+    void testClsDateConstructor_DayMonthYear_InvalidLeapYearFeb29() {
+        // Invalid Feb 29 in non-leap year
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(29, 2, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    // ============== Tests for setter validations ==============
+
+    @Test
+    void testSetDay_BoundaryMaxDay() {
+        // Test setting day to max valid day
+        clsDate date = new clsDate(1, 1, 2023);
+        date.setDay(31);
+        assertEquals(31, date.getDay());
+    }
+
+    @Test
+    void testSetDay_BoundaryMinDay() {
+        // Test setting day to min valid day
+        clsDate date = new clsDate(15, 1, 2023);
+        date.setDay(1);
+        assertEquals(1, date.getDay());
+    }
+
+    @Test
+    void testSetDay_InvalidZero() {
+        clsDate date = new clsDate(15, 1, 2023);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setDay(0);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    // ============== Tests for various month boundaries ==============
+
+
+
+    @Test
+    void testGetDifferenceInDays_SpanningLeapYear() {
+        clsDate date1 = new clsDate(1, 2, 2024);
+        clsDate date2 = new clsDate(1, 3, 2024);
+
+        int difference = clsDate.getDifferenceInDays(date1, date2);
+        assertEquals(29, difference); // February has 29 days in 2024
+    }
+
+    @Test
+    void testGetDifferenceInDays_SpanningNonLeapYear() {
+        clsDate date1 = new clsDate(1, 2, 2023);
+        clsDate date2 = new clsDate(1, 3, 2023);
+
+        int difference = clsDate.getDifferenceInDays(date1, date2);
+        assertEquals(28, difference); // February has 28 days in 2023
+    }
+
+    @Test
+    void testClsDateConstructor_NoArgs_UsesSystemDate() {
+        // This ensures the default constructor branches are covered
+        clsDate date = new clsDate();
+        assertNotNull(date);
+        assertTrue(date.getDay() >= 1 && date.getDay() <= 31);
+        assertTrue(date.getMonth() >= 1 && date.getMonth() <= 12);
+        assertTrue(date.getYear() >= 2024);
+    }
+
+    // ============== Tests for isDate1BeforeDate2 - All remaining branches ==============
+
+    @Test
+    void testIsDate1BeforeDate2_YearEqual_MonthEqual_DayEqual() {
+        // Tests all equal - should return false
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        assertFalse(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_YearEqual_MonthLess_DayGreater() {
+        // Year equal, month1 < month2 (should be true regardless of day)
+        clsDate date1 = new clsDate(25, 5, 2023);
+        clsDate date2 = new clsDate(1, 6, 2023);
+        assertTrue(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    @Test
+    void testIsDate1BeforeDate2_YearEqual_MonthEqual_DayLess() {
+        // Year equal, month equal, day1 < day2
+        clsDate date1 = new clsDate(10, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        assertTrue(clsDate.isDate1BeforeDate2(date1, date2));
+    }
+
+    // ============== Tests for isDate1EqualDate2 - All remaining branches ==============
+
+    @Test
+    void testIsDate1EqualDate2_AllFieldsEqual() {
+        // Tests the true branch through all conditions
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        assertTrue(clsDate.isDate1EqualDate2(date1, date2));
+    }
+
+    // ============== Tests for getDifferenceInDays - Loop branches ==============
+
+    @Test
+    void testGetDifferenceInDays_EqualDates_NoLoop() {
+        // Tests when while condition is false immediately
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        assertEquals(0, clsDate.getDifferenceInDays(date1, date2));
+    }
+
+    @Test
+    void testGetDifferenceInDays_OneDayDifference() {
+        // Tests while loop executes exactly once
+        clsDate date1 = new clsDate(15, 6, 2023);
+        clsDate date2 = new clsDate(16, 6, 2023);
+        assertEquals(1, clsDate.getDifferenceInDays(date1, date2));
+    }
+
+    @Test
+    void testGetDifferenceInDays_Date1AfterDate2_Negative() {
+        // Ensures negative result when date1 > date2
+        clsDate date1 = new clsDate(20, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        assertEquals(-5, clsDate.getDifferenceInDays(date1, date2));
+    }
+
+    // ============== Tests for addDays - Loop exit branches ==============
+
+    @Test
+    void testAddDays_ExactlyOneMonth() {
+        // Tests adding exact number of days to reach next month
+        clsDate date = new clsDate(15, 1, 2023);
+        date.addDays(17); // Should be Feb 1
+        assertEquals(1, date.getDay());
+        assertEquals(2, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testAddDays_MultipleYears() {
+        // Tests wrapping through multiple years
+        clsDate date = new clsDate(1, 1, 2023);
+        date.addDays(730); // 730 days from Jan 1, 2023
+        // 2023 has 365 days, 2024 has 366 days (leap year)
+        // 730 = 365 + 365, but 2024 is leap so: 365 (2023) + 365 (into 2024) = Dec 31, 2024
+        assertEquals(31, date.getDay());
+        assertEquals(12, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidMonth_LessThan1() {
+        // Tests the month < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(15, 0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidMonth_GreaterThan12() {
+        // Tests the month > 12 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(15, 13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidYear_Zero() {
+        // Tests the year < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(15, 6, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidYear_Negative() {
+        // Tests the year < 1 branch with negative value
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(15, 6, -100);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_ValidInputs_AllBranchesPass() {
+        // Tests when all validations pass
+        int days = clsDate.daysFromTheBeginningOfTheYear(15, 6, 2023);
+        assertEquals(166, days); // Jan(31) + Feb(28) + Mar(31) + Apr(30) + May(31) + 15 = 166
+    }
+
+    @Test
+    void testAddDays_FromLeapYearFeb28To29() {
+        // Tests leap year boundary
+        clsDate date = new clsDate(28, 2, 2024);
+        date.addDays(1);
+        assertEquals(29, date.getDay());
+        assertEquals(2, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    @Test
+    void testDayOfWeekOrder_InvalidMonth_LessThan1() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(15, 0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testDayOfWeekOrder_InvalidMonth_GreaterThan12() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(15, 13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testDayOfWeekOrder_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(15, 6, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testDayOfWeekOrder_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(15, 6, -100);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testDayOfWeekOrder_ValidInputs_AllBranchesPass() {
+        int order = clsDate.dayOfWeekOrder(15, 6, 2023);
+        assertTrue(order >= 0 && order <= 6);
+    }
+
+    // Add these tests to TestClsDate.java:
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidMonth_LessThan1() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(15, 0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidMonth_GreaterThan12() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(15, 13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(15, 6, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(15, 6, -2023);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+    // Add these tests to TestClsDate.java:
+
+    @Test
+    void testNumberOfHoursInAYear_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfHoursInAYear(0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    // Add these tests to TestClsDate.java:
+
+    @Test
+    void testNumberOfSecondsInAYear_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfSecondsInAYear(0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testNumberOfSecondsInAYear_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfSecondsInAYear(-100);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+    @Test
+    void testNumberOfHoursInAYear_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfHoursInAYear(-100);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+    // Add ALL these tests to TestClsDate.java:
+
+    // Tests for numberOfHoursInAYear:
+
+
+// Add these tests to TestClsDate.java:
+
+    @Test
+    void testDayShortName_DayMonthYear_InvalidMonth_LessThan1() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(15, 0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testDayShortName_DayMonthYear_InvalidMonth_GreaterThan12() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(15, 13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+// Add these tests to TestClsDate.java to cover both branches of day validation:
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidDay_LessThan1() {
+        // Tests the day < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(0, 6, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidDay_GreaterThanMax() {
+        // Tests the day > maxDays branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(32, 6, 2023); // June has 30 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_InvalidDay_Feb30NonLeap() {
+        // Tests day > maxDays for February in non-leap year
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.daysFromTheBeginningOfTheYear(30, 2, 2023); // Feb has 28 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+    @Test
+    void testDayShortName_DayMonthYear_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(15, 6, 0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+
+    // Add these tests to TestClsDate.java to cover both branches of month validation:
+
+    @Test
+    void testPrintMonthCalendar_InvalidMonth_LessThan1() {
+        // Tests the month < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.printMonthCalendar(0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+
+    // Add these tests to TestClsDate.java to cover both branches of monthNumber validation:
+
+    @Test
+    void testMonthShortName_InvalidMonth_LessThan1() {
+        // Tests the monthNumber < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.monthShortName(0);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    // Add these tests to TestClsDate.java to cover both branches of dayOfWeekOrder validation:
+// Add these tests to TestClsDate.java to cover both branches of day validation:
+
+    @Test
+    void testDayOfWeekOrder_InvalidDay_LessThan1() {
+        // Tests the day < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(0, 6, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    // Add these tests to TestClsDate.java to cover both branches of day validation:
+
+    @Test
+    void testClsDateConstructor_String_InvalidDay_LessThan1() {
+        // Tests the day < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("0/6/2023");
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidDay_GreaterThanMax() {
+        // Tests the day > maxDays branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("32/6/2023"); // June has 30 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidDay_Feb30() {
+        // Tests day > maxDays for February
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("30/2/2023"); // Feb has 28 days in 2023
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+    @Test
+    void testClsDateConstructor_IntParams_InvalidDay_LessThan1() {
+        // Tests the day < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(0, 6, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidDay_GreaterThanMax() {
+        // Tests the day > maxDays branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(32, 6, 2023); // June has 30 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testClsDateConstructor_IntParams_InvalidDay_Feb30() {
+        // Tests day > maxDays for February
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate(30, 2, 2023); // Feb has 28 days in 2023
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+    @Test
+    void testDayShortName_DayMonthYear_InvalidDay_LessThan1() {
+        // Tests the day < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(0, 6, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testDayShortName_DayMonthYear_InvalidDay_GreaterThanMax() {
+        // Tests the day > maxDays branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(32, 6, 2023); // June has 30 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testDayShortName_DayMonthYear_InvalidDay_Feb30() {
+        // Tests day > maxDays for February
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(30, 2, 2023); // Feb has 28 days in 2023
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testSetMonth_InvalidMonth_LessThan1() {
+        // Tests the month < 1 branch
+        clsDate date = new clsDate(15, 6, 2023);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setMonth(0);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testSetMonth_InvalidMonth_GreaterThan12() {
+        // Tests the month > 12 branch
+        clsDate date = new clsDate(15, 6, 2023);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            date.setMonth(13);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+    @Test
+    void testNumberOfDaysInAMonth_InvalidMonth_LessThan1() {
+        // Tests the month < 1 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAMonth(0, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_InvalidMonth_GreaterThan12() {
+        // Tests the month > 12 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfDaysInAMonth(13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+    @Test
+    void testDayOfWeekOrder_InvalidDay_GreaterThanMax() {
+        // Tests the day > maxDays branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(32, 6, 2023); // June has 30 days
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+
+    @Test
+    void testDayOfWeekOrder_InvalidDay_Feb30() {
+        // Tests day > maxDays for February
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayOfWeekOrder(30, 2, 2023); // Feb has 28 days in 2023
+        });
+        assertTrue(exception.getMessage().contains("Day must be between 1 and"));
+    }
+    @Test
+    void testDayShortName_DayOfWeekOrder_LessThan0() {
+        // Tests the dayOfWeekOrder < 0 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(-1);
+        });
+        assertTrue(exception.getMessage().contains("day must be from 0 to 6"));
+    }
+
+    @Test
+    void testDayShortName_DayOfWeekOrder_GreaterThan6() {
+        // Tests the dayOfWeekOrder > 6 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(7);
+        });
+        assertTrue(exception.getMessage().contains("day must be from 0 to 6"));
+    }
+
+    @Test
+    void testMonthShortName_InvalidMonth_GreaterThan12() {
+        // Tests the monthNumber > 12 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.monthShortName(13);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+    @Test
+    void testPrintMonthCalendar_InvalidMonth_GreaterThan12() {
+        // Tests the month > 12 branch
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.printMonthCalendar(13, 2023);
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+    @Test
+    void testDayShortName_DayMonthYear_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.dayShortName(15, 6, -2023);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    // Tests for numberOfMinutesInAYear:
+    @Test
+    void testNumberOfMinutesInAYear_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfMinutesInAYear(0);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+
+    @Test
+    void testNumberOfMinutesInAYear_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            clsDate.numberOfMinutesInAYear(-100);
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than  0"));
+    }
+    @Test
+    void testAddDays_FromLeapYearFeb29ToMarch1() {
+        // Tests leap year Feb 29 to March 1
+        clsDate date = new clsDate(29, 2, 2024);
+        date.addDays(1);
+        assertEquals(1, date.getDay());
+        assertEquals(3, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    // ============== Tests for getDateFromDayOrderInYear - Loop branches ==============
+    @Test
+    void testClsDateConstructor_String_InvalidMonth_LessThan1() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("15/0/2023");
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidMonth_GreaterThan12() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("15/13/2023");
+        });
+        assertTrue(exception.getMessage().contains("Month must be between 1 and 12"));
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidYear_Zero() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("15/6/0");
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+    @Test
+    void testClsDateConstructor_String_InvalidYear_Negative() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new clsDate("15/6/-2023");
+        });
+        assertTrue(exception.getMessage().contains("Year must be bigger than"));
+    }
+
+
+
+    @Test
+    void testGetDateFromDayOrderInYear_ExactlyEndOfMonth() {
+        // Tests when remainingDays equals monthDays
+        clsDate date = clsDate.getDateFromDayOrderInYear(31, 2023); // Jan 31
+        assertEquals(31, date.getDay());
+        assertEquals(1, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_CrossMultipleMonths() {
+        // Tests loop continues through several months
+        clsDate date = clsDate.getDateFromDayOrderInYear(200, 2023);
+        assertEquals(19, date.getDay());
+        assertEquals(7, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testGetDateFromDayOrderInYear_Day366LeapYear() {
+        // Tests last day of leap year
+        clsDate date = clsDate.getDateFromDayOrderInYear(366, 2024);
+        assertEquals(31, date.getDay());
+        assertEquals(12, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    // ============== Tests for numberOfDaysInAMonth - Array access branches ==============
+
+    @Test
+    void testNumberOfDaysInAMonth_AllMonthsNonLeapYear() {
+        // Ensures all array indices are accessed
+        int[] expected = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        for (int month = 1; month <= 12; month++) {
+            assertEquals(expected[month - 1], clsDate.numberOfDaysInAMonth(month, 2023));
+        }
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_Month1() {
+        assertEquals(31, clsDate.numberOfDaysInAMonth(1, 2023));
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_Month3() {
+        assertEquals(31, clsDate.numberOfDaysInAMonth(3, 2023));
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_Month4() {
+        assertEquals(30, clsDate.numberOfDaysInAMonth(4, 2023));
+    }
+
+    @Test
+    void testNumberOfDaysInAMonth_Month12() {
+        assertEquals(31, clsDate.numberOfDaysInAMonth(12, 2023));
+    }
+
+    // ============== Tests for dayOfWeekOrder - Formula branches ==============
+
+    @Test
+    void testDayOfWeekOrder_January() {
+        // Tests January (month = 1) in formula
+        int order = clsDate.dayOfWeekOrder(1, 1, 2023);
+        assertEquals(0, order); // Sunday
+    }
+
+    @Test
+    void testDayOfWeekOrder_December() {
+        // Tests December (month = 12) in formula
+        int order = clsDate.dayOfWeekOrder(31, 12, 2023);
+        assertEquals(0, order); // Sunday
+    }
+
+    @Test
+    void testDayOfWeekOrder_VariousDaysInMonth() {
+        // Tests different days in same month
+        clsDate date1 = new clsDate(1, 6, 2023);
+        clsDate date2 = new clsDate(15, 6, 2023);
+        clsDate date3 = new clsDate(30, 6, 2023);
+
+        assertTrue(date1.dayOfWeekOrder() >= 0 && date1.dayOfWeekOrder() <= 6);
+        assertTrue(date2.dayOfWeekOrder() >= 0 && date2.dayOfWeekOrder() <= 6);
+        assertTrue(date3.dayOfWeekOrder() >= 0 && date3.dayOfWeekOrder() <= 6);
+    }
+
+    // ============== Tests for daysFromTheBeginningOfTheYear - Loop branches ==============
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_FirstDay() {
+        // Tests when loop doesn't execute (month = 1)
+        assertEquals(1, clsDate.daysFromTheBeginningOfTheYear(1, 1, 2023));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_LastDayOfMonth() {
+        // Tests with last day of various months
+        assertEquals(31, clsDate.daysFromTheBeginningOfTheYear(31, 1, 2023));
+        assertEquals(59, clsDate.daysFromTheBeginningOfTheYear(28, 2, 2023));
+    }
+
+    @Test
+    void testDaysFromTheBeginningOfTheYear_MidYear() {
+        // Tests loop through multiple months
+        assertEquals(182, clsDate.daysFromTheBeginningOfTheYear(1, 7, 2023));
+    }
+
+    // ============== Tests for instance method branches ==============
+
+    @Test
+    void testInstanceMethod_DaysFromBeginningOfYear() {
+        clsDate date = new clsDate(1, 7, 2023);
+        assertEquals(182, date.daysFromTheBeginningOfTheYear());
+    }
+
+    @Test
+    void testInstanceMethod_GetDifferenceInDays() {
+        clsDate date1 = new clsDate(1, 1, 2023);
+        clsDate date2 = new clsDate(10, 1, 2023);
+        assertEquals(9, date1.getDifferenceInDays(date2));
+    }
+
+    @Test
+    void testInstanceMethod_IsDateBeforeDate2_True() {
+        clsDate date1 = new clsDate(1, 1, 2023);
+        clsDate date2 = new clsDate(10, 1, 2023);
+        assertTrue(date1.isDateBeforeDate2(date2));
+    }
+
+    @Test
+    void testInstanceMethod_IsDateBeforeDate2_False() {
+        clsDate date1 = new clsDate(10, 1, 2023);
+        clsDate date2 = new clsDate(1, 1, 2023);
+        assertFalse(date1.isDateBeforeDate2(date2));
+    }
+
+    @Test
+    void testInstanceMethod_IsDateEqualDate2_True() {
+        clsDate date1 = new clsDate(1, 1, 2023);
+        clsDate date2 = new clsDate(1, 1, 2023);
+        assertTrue(date1.isDateEqualDate2(date2));
+    }
+
+    @Test
+    void testInstanceMethod_IsDateEqualDate2_False() {
+        clsDate date1 = new clsDate(1, 1, 2023);
+        clsDate date2 = new clsDate(2, 1, 2023);
+        assertFalse(date1.isDateEqualDate2(date2));
+    }
+
+    // ============== Tests for edge cases in validation ==============
+
+    @Test
+    void testConstructor_Day1() {
+        clsDate date = new clsDate(1, 6, 2023);
+        assertEquals(1, date.getDay());
+    }
+
+    @Test
+    void testConstructor_Day31() {
+        clsDate date = new clsDate(31, 1, 2023);
+        assertEquals(31, date.getDay());
+    }
+
+    @Test
+    void testConstructor_Month1() {
+        clsDate date = new clsDate(15, 1, 2023);
+        assertEquals(1, date.getMonth());
+    }
+
+    @Test
+    void testConstructor_Month12() {
+        clsDate date = new clsDate(15, 12, 2023);
+        assertEquals(12, date.getMonth());
+    }
+
+    @Test
+    void testConstructor_Year1() {
+        clsDate date = new clsDate(15, 6, 1);
+        assertEquals(1, date.getYear());
+    }
+
+    // ============== Tests for setter boundary values ==============
+
+    @Test
+    void testSetMonth_Boundary1() {
+        clsDate date = new clsDate(15, 6, 2023);
+        date.setMonth(1);
+        assertEquals(1, date.getMonth());
+    }
+
+    @Test
+    void testSetMonth_Boundary12() {
+        clsDate date = new clsDate(15, 6, 2023);
+        date.setMonth(12);
+        assertEquals(12, date.getMonth());
+    }
+
+    @Test
+    void testSetYear_Boundary1() {
+        clsDate date = new clsDate(15, 6, 2023);
+        date.setYear(1);
+        assertEquals(1, date.getYear());
+    }
+
+    @Test
+    void testSetDay_February29LeapYear() {
+        clsDate date = new clsDate(1, 2, 2024);
+        date.setDay(29);
+        assertEquals(29, date.getDay());
+    }
+
+    // ============== Tests for String constructor edge cases ==============
+
+    @Test
+    void testStringConstructor_SingleDigitDay() {
+        clsDate date = new clsDate("5/6/2023");
+        assertEquals(5, date.getDay());
+        assertEquals(6, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testStringConstructor_SingleDigitMonth() {
+        clsDate date = new clsDate("15/3/2023");
+        assertEquals(15, date.getDay());
+        assertEquals(3, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    // ============== Tests for remaining uncovered branches ==============
+
+    @Test
+    void testAddDays_CrossingFebruaryNonLeap() {
+        clsDate date = new clsDate(15, 2, 2023);
+        date.addDays(20); // Should go to March
+        assertEquals(7, date.getDay());
+        assertEquals(3, date.getMonth());
+        assertEquals(2023, date.getYear());
+    }
+
+    @Test
+    void testAddDays_CrossingFebruaryLeap() {
+        clsDate date = new clsDate(15, 2, 2024);
+        date.addDays(20); // Should go to March
+        assertEquals(6, date.getDay());
+        assertEquals(3, date.getMonth());
+        assertEquals(2024, date.getYear());
+    }
+
+    @Test
+    void testAddDays_LargeDayCount() {
+        clsDate date = new clsDate(1, 1, 2020);
+        date.addDays(1000);
+        // Should be somewhere in 2022
+        assertEquals(2022, date.getYear());
+    }
+
+    @Test
+    void testDayShortName_AllDaysOfWeek() {
+        String[] expected = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        for (int i = 0; i < 7; i++) {
+            assertEquals(expected[i], clsDate.dayShortName(i));
+        }
+    }
+
+    @Test
+    void testMonthShortName_AllMonths() {
+        String[] expected = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        for (int i = 1; i <= 12; i++) {
+            assertEquals(expected[i - 1], clsDate.monthShortName(i));
+        }
+    }
+
+    // ============== Tests for copy constructor branches ==============
+
+    @Test
+    void testCopyConstructor_AllFields() {
+        clsDate original = new clsDate(15, 6, 2023);
+        clsDate copy = new clsDate(original);
+
+        assertEquals(original.getDay(), copy.getDay());
+        assertEquals(original.getMonth(), copy.getMonth());
+        assertEquals(original.getYear(), copy.getYear());
+
+        // Ensure they are independent
+        copy.setDay(20);
+        assertEquals(15, original.getDay());
+        assertEquals(20, copy.getDay());
+    }
 	
 	 
 }

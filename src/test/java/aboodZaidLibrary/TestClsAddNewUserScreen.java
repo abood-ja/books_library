@@ -5,9 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,25 +21,72 @@ public class TestClsAddNewUserScreen {
     private ByteArrayOutputStream outputStream;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // Capture console output
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        if (clsUserSession.currentUser == null){
-            clsUserSession.currentUser = clsUser.GetAddNewUserObject("testuser");
-            clsUserSession.currentUser.setFirstName("Test");
-            clsUserSession.currentUser.setLastName("User");}
+        // 1. Backup original Users.txt
+        File usersFile = new File("Users.txt");
+        File backupFile = new File("Users_backup.txt");
+        if (usersFile.exists()) {
+            Files.copy(usersFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 2. Empty file and write test line BEFORE initializing currentUser
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(usersFile, false))) {
+            bw.write("zaid#//#marabeh#//#Hilal@Gmail.com#//#83983948#//#User2#//#3456#//#-1");
+            bw.newLine();
+        }
+
+        // 3. Now safely initialize currentUser
+        clsUserSession.currentUser = clsUser.find("", "");
+
+        // 4. Reset input scanner
         clsInputValidate.setTestScanner(null);
+
+        clsUserSession.currentUser = clsUser.GetAddNewUserObject("testuser");
+        clsUserSession.currentUser.setFirstName("Test");
+        clsUserSession.currentUser.setLastName("User");
     }
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         // Restore original System.out
         System.setOut(originalOut);
 
         // Reset static state
         clsUserSession.currentUser = null;
         clsInputValidate.setTestScanner(null);
+
+        // Restore Users.txt
+        File usersFile = new File("Users.txt");
+        File backupFile = new File("Users_backup.txt");
+        if (backupFile.exists()) {
+            Files.copy(backupFile.toPath(), usersFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            backupFile.delete();
+        }
+    }
+
+
+    @BeforeEach
+    void backupUsersFile() throws Exception {
+        File usersFile = new File("Users.txt");
+        File backupFile = new File("Users_backup.txt");
+        if (usersFile.exists()) {
+            Files.copy(usersFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Backup created: " + backupFile.getAbsolutePath());
+        }
+    }
+
+    @AfterEach
+    void restoreUsersFile() throws Exception {
+        File usersFile = new File("Users.txt");
+        File backupFile = new File("Users_backup.txt");
+        if (backupFile.exists()) {
+            Files.copy(backupFile.toPath(), usersFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            backupFile.delete();
+            System.out.println("Users.txt restored from backup");
+        }
     }
     @Test
     void test_PrintUser() throws Exception {
@@ -216,4 +267,141 @@ public class TestClsAddNewUserScreen {
         Assertions.assertTrue(output.contains("Delete Book? y/n?"));
         Assertions.assertTrue(output.contains("Manage Users? y/n?"));
     }
+
+    @Test
+    void test_ShowAddUserScreen_WrongThenCorrectUsername() throws Exception {
+        // 1. Backup Users.txt
+        File usersFile = new File("Users.txt");
+        File backupFile = new File("Users_backup.txt");
+        if (usersFile.exists()) {
+            Files.copy(usersFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // 2. Empty the file and add a single existing user
+            try (PrintWriter writer = new PrintWriter(usersFile)) {
+                writer.write("ahmad#//#mara#//#s12218431@stu.najah.edu#//#1234444#//#ahmad#//#3456#//#0\n");
+            }
+
+            // 3. Set the current user with full permissions
+            clsUserSession.currentUser = new clsUser(
+                    clsUser.enMode.AddNewMode,
+                    "John",
+                    "Doe",
+                    "john@example.com",
+                    "12345678",
+                    "johndoe",
+                    "password123",
+                    clsUser.enPermissions.eAll.getValue()
+            );
+
+            // 4. Prepare simulated input
+            String simulatedInput = String.join(System.lineSeparator(),
+                    "ahmad",   // First attempt: username already exists
+                    "User1",   // Second attempt: new valid username
+                    "Ahmad",   // FirstName
+                    "Mara",    // LastName
+                    "ahmad@example.com", // Email
+                    "5551234567", // Phone
+                    "mypassword", // Password
+                    "y",      // Full access
+                    "n", "n", "n" // Add/Delete/Manage Users (ignored because full access)
+            );
+
+            clsInputValidate.setTestScanner(new Scanner(simulatedInput));
+
+            // 5. Call the method
+            clsAddUserScreen.showAddUserScreen();
+
+            // 6. Capture the output
+            String output = outputStream.toString();
+
+            // 7. Assertions on output
+            assertTrue(output.contains("This Username is already used, choose another one:"),
+                    "Expected message about already used username when first entering 'ahmad'");
+            assertTrue(output.contains("User Added successfully"),
+                    "Expected success message after entering a valid new username");
+
+            // 8. Verify the file now has 2 lines (original + new user)
+            long linesCount = Files.lines(usersFile.toPath()).count();
+            assertEquals(2, linesCount, "Expected Users.txt to contain 2 lines after adding the new user");
+
+        } finally {
+            // Reset test scanner
+            clsInputValidate.setTestScanner(null);
+
+            // Restore original Users.txt
+            if (backupFile.exists()) {
+                Files.copy(backupFile.toPath(), usersFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                backupFile.delete();
+            }
+        }
+    }
+
+
+    @Test
+    void test_ReadPermissions_Mixed() throws Exception {
+        // Simulate mixed input
+        String simulatedInput = String.join(System.lineSeparator(),
+                "n", // Full access? No
+                "y", // Add New Book
+                "n", // Delete Book
+                "y"  // Manage Users
+        );
+
+        clsInputValidate.setTestScanner(new Scanner(simulatedInput));
+
+        Method readPermissionsMethod = clsAddUserScreen.class
+                .getDeclaredMethod("_ReadPermissionsToSet");
+        readPermissionsMethod.setAccessible(true);
+
+        int permissions = (int) readPermissionsMethod.invoke(null);
+
+        int expected = clsUser.enPermissions.pAddNewBook.getValue()
+                + clsUser.enPermissions.pManageUsers.getValue(); // only Add and Manage
+        assertEquals(expected, permissions);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Do you want to give full access y/n?"));
+        assertTrue(output.contains("Add New Book? y/n?"));
+        assertTrue(output.contains("Delete Book? y/n?"));
+        assertTrue(output.contains("Manage Users? y/n?"));
+    }
+
+
+    @Test
+    void test_ReadPermissionsToSet_MixedPermissions() throws Exception {
+        // Simulate input:
+        // n -> full access
+        // y -> Add New Book
+        // n -> Delete Book
+        // y -> Manage Users
+        String simulatedInput = String.join(System.lineSeparator(),
+                "n", // Full access? No
+                "y", // Add New Book
+                "n", // Delete Book
+                "y"  // Manage Users
+        );
+
+        clsInputValidate.setTestScanner(new Scanner(simulatedInput));
+
+        Method readPermissionsMethod = clsAddUserScreen.class
+                .getDeclaredMethod("_ReadPermissionsToSet");
+        readPermissionsMethod.setAccessible(true);
+
+        int permissions = (int) readPermissionsMethod.invoke(null);
+
+        int expected = clsUser.enPermissions.pAddNewBook.getValue()
+                + clsUser.enPermissions.pManageUsers.getValue();
+
+        assertEquals(expected, permissions);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Do you want to give full access y/n?"));
+        assertTrue(output.contains("Add New Book? y/n?"));
+        assertTrue(output.contains("Delete Book? y/n?"));
+        assertTrue(output.contains("Manage Users? y/n?"));
+    }
+
+
 }

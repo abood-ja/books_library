@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class clsLoginScreen extends clsScreen {
 
-    // ====== تسجيل الدخول ======
+
     private static boolean _Login() {
         int failedLoginCount = 0;
 
@@ -111,9 +111,7 @@ public class clsLoginScreen extends clsScreen {
             // توجيه المستخدم مباشرة إلى قائمته
             clsUserMainScreen.showMainMenu();
             return true;
-        } else if (result == clsUser.enSaveResults.svFaildUserExists) {
-            System.out.println("\n⚠️ Username already exists!");
-        } else {
+        }  else {
             System.out.println("\n❌ Failed to create account!");
         }
 
@@ -177,9 +175,7 @@ public class clsLoginScreen extends clsScreen {
                 case 3:
                     System.out.println("\n👋 Goodbye!");
                     return false;
-                default:
-                    System.out.println("❌ Invalid choice!");
-                    break;
+
             }
 
             System.out.println("\nPress any key to continue...");

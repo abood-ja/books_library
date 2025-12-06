@@ -9,7 +9,6 @@ class TestClsPerson {
     @Test
     void testConstructorAndGetters() {
         clsPerson person = new clsPerson("John", "Doe", "john@example.com", "123456789");
-
         assertEquals("John", person.getFirstName());
         assertEquals("Doe", person.getLastName());
         assertEquals("john@example.com", person.getEmail());

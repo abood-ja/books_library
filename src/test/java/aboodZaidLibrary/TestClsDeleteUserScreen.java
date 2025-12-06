@@ -186,7 +186,7 @@ class TestClsDeleteUserScreen {
 
 
     @Test
-    void test_showDeleteUserScreen_CanDeleteUser_ConfirmYes() throws Exception {
+    void test_showDeleteUserScreen_CanDeleteUser_Confirmyes() throws Exception {
         // 1. Backup Users.txt and Loans.txt
         File usersFile = new File("Users.txt");
         File loansFile = new File("Loans.txt");
@@ -249,6 +249,72 @@ class TestClsDeleteUserScreen {
             }
         }
     }
+
+    @Test
+    void test_showDeleteUserScreen_CanDeleteUser_ConfirmYes() throws Exception {
+        // 1. Backup Users.txt and Loans.txt
+        File usersFile = new File("Users.txt");
+        File loansFile = new File("Loans.txt");
+        File usersBackup = new File("Users_backup.txt");
+        File loansBackup = new File("Loans_backup.txt");
+
+        if (usersFile.exists()) {
+            Files.copy(usersFile.toPath(), usersBackup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        if (loansFile.exists()) {
+            Files.copy(loansFile.toPath(), loansBackup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // 2. Empty both files
+            PrintWriter writerUsers = new PrintWriter(usersFile);
+            writerUsers.close();
+            PrintWriter writerLoans = new PrintWriter(loansFile);
+            writerLoans.close();
+
+            // 3. Write test user data
+            try (FileWriter fw = new FileWriter(usersFile)) {
+                fw.write("zaid#//#marabeh#//#Hilal@Gmail.com#//#83983948#//#User2#//#3456#//#-1\n");
+            }
+            // Leave Loans.txt empty
+
+            // 4. Simulate user input: enter username "User2" then confirm 'y'
+            String simulatedInput = "User2\nY\n";
+            Scanner testScanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
+            clsInputValidate.setTestScanner(testScanner);
+
+            // 5. Call the method
+            clsDeleteUserScreen.showDeleteUserScreen();
+
+            // 6. Capture output
+            String output = outputStream.toString();
+
+            // Assertions
+            assertTrue(output.contains("User Details:"));
+            assertTrue(output.contains("User FirstName : zaid"));
+            assertTrue(output.contains("User LastName : marabeh"));
+            assertTrue(output.contains("✔ User Deleted Successfully!"));
+
+            // 7. Verify the user is deleted from Users.txt
+            String fileContent = String.join("\n", Files.readAllLines(usersFile.toPath()));
+            assertFalse(fileContent.contains("zaid#//#marabeh#//#Hilal@Gmail.com#//#83983948#//#User2#//#3456#//#-1"));
+
+        } finally {
+            // Reset test scanner
+            clsInputValidate.setTestScanner(null);
+
+            // 8. Restore original files
+            if (usersBackup.exists()) {
+                Files.copy(usersBackup.toPath(), usersFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                usersBackup.delete();
+            }
+            if (loansBackup.exists()) {
+                Files.copy(loansBackup.toPath(), loansFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                loansBackup.delete();
+            }
+        }
+    }
+
 
 
     @Test

@@ -3,9 +3,13 @@ package aboodZaidLibrary;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.*;
+import java.util.Scanner;
 
 public class TestClsFindUserScreen {
 
@@ -101,5 +105,70 @@ public class TestClsFindUserScreen {
             System.setIn(System.in);
         }
     }
+
+    @Test
+    void testShowFindUserScreen_FirstWrongThenCorrect() throws Exception {
+
+        Path usersFile = Paths.get("Users.txt");
+        Path backupFile = Paths.get("Users_backup.txt");
+
+        // Backup existing Users.txt
+        if (Files.exists(usersFile)) {
+            Files.copy(usersFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        try {
+            // Write test user
+            String testUser = "abood#//#jarrar#//#abood@gmail.com#//#0599#//#user1#//#1234#//#-1\n";
+            Files.write(usersFile, testUser.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            // Input for the test — first wrong, then correct
+            String simulatedInput = "wrongUser\nuser1\n";
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(simulatedInput.getBytes());
+
+            // ✔ Inject test scanner instead of relying on System.in
+            clsInputValidate.setTestScanner(new Scanner(inputStream));
+
+            // Capture output
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PrintStream originalOut = System.out;
+            System.setOut(new PrintStream(outputStream));
+
+            // Execute method
+            clsFindUserScreen.showFindUserScreen();
+
+            // Restore output
+            System.setOut(originalOut);
+
+            String output = outputStream.toString();
+
+            // Assertions
+            assertTrue(output.contains("Find User Screen"));
+            assertTrue(output.contains("Please enter Account Username"));
+
+            // First input wrong
+            assertTrue(output.contains("Username is not found"));
+
+            // Correct user loaded
+            assertTrue(output.contains("User Found"));
+            assertTrue(output.contains("abood"));
+            assertTrue(output.contains("jarrar"));
+            assertTrue(output.contains("abood@gmail.com"));
+
+        } finally {
+
+            // Restore Users.txt
+            if (Files.exists(backupFile)) {
+                Files.copy(backupFile, usersFile, StandardCopyOption.REPLACE_EXISTING);
+                Files.delete(backupFile);
+            } else {
+                Files.deleteIfExists(usersFile);
+            }
+
+            // Reset scanner so it won't affect other tests
+            clsInputValidate.setTestScanner(null);
+        }
+    }
+
 
 }

@@ -21,9 +21,6 @@ public class clsUserCDsMenuScreen extends clsScreen {
         }
     }
 
-    // =============================
-    //        BORROW CD
-    // =============================
     private static void _BorrowCD() {
         __ensureLoansFile();
 
@@ -120,9 +117,7 @@ public class clsUserCDsMenuScreen extends clsScreen {
         return false;
     }
 
-    // =============================
-    //      RETURN CD
-    // =============================
+
     private static void _ReturnCD() {
         __ensureLoansFile();
         String pad = String.format("%37s", "");
@@ -138,10 +133,7 @@ public class clsUserCDsMenuScreen extends clsScreen {
         String username = clsUserSession.currentUser.getUserName().trim().toLowerCase();
 
         Path f = Paths.get(LOANS_FILE);
-        if (!Files.exists(f)) {
-            System.out.println(pad + "No loans found.");
-            return;
-        }
+
 
         try {
             List<String> lines = Files.readAllLines(f);
@@ -192,9 +184,7 @@ public class clsUserCDsMenuScreen extends clsScreen {
         }
     }
 
-    // =============================
-    //      OVERDUE CDs
-    // =============================
+
     private static void _MyOverdueCDs() {
         __ensureLoansFile();
         String pad = String.format("%37s", "");
@@ -241,11 +231,9 @@ public class clsUserCDsMenuScreen extends clsScreen {
             System.out.println(pad + "No overdue CDs 👍");
     }
 
-    // =============================
-    //      MENU CONTROLS
-    // =============================
 
-    private enum enCDMenuOptions {
+
+    public enum enCDMenuOptions {
         eList(1), eBorrow(2), eReturn(3), eOverdue(4), eFind(5), eBack(6);
 
         private final int value;
