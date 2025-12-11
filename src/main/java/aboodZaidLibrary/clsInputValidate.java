@@ -43,7 +43,7 @@ public class clsInputValidate {
             System.out.print(errorMessage);
             number = readIntNumber();
         }
-
+// hi
         return number;
     }
 
