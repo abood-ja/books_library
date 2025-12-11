@@ -545,16 +545,35 @@ class TestClsFine {
 
     @Test
     void testPayAllUserFinesNoFines() throws Exception {
+
+        // Arrange
+        List<String> before = Files.readAllLines(Paths.get(FINES_FILE));
+
+        // Act
         clsFine.payAllUserFines("nonexistent");
-        // File unchanged, covers for-loop skip branches [file:1]
+
+        // Assert
+        List<String> after = Files.readAllLines(Paths.get(FINES_FILE));
+        Assertions.assertEquals(before, after, "File should remain unchanged when user has no fines.");
     }
+
 
     @Test
     void testPayAllUserFinesEmptyFinesFile() throws Exception {
-        Files.write(Paths.get(FINES_FILE), new ArrayList<>()); // Empty file
+
+        // Arrange: create an empty fines file
+        Files.write(Paths.get(FINES_FILE), new ArrayList<>());
+
+        List<String> before = Files.readAllLines(Paths.get(FINES_FILE));
+
+        // Act
         clsFine.payAllUserFines("user10");
-        // Covers empty lines loop skip [file:1]
+
+        // Assert: file should remain empty
+        List<String> after = Files.readAllLines(Paths.get(FINES_FILE));
+        Assertions.assertEquals(before, after, "Empty fines file should remain unchanged.");
     }
+
 
 
 }
