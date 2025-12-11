@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsFine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsFine.java</span></div><h1>clsFine.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.regex.Pattern;
+
+<span class="nc" id="L9">public class clsFine {</span>
+
+    private static final String SEP = &quot;#//#&quot;;
+    private static final String LOANS_FILE = &quot;Loans.txt&quot;;
+    private static final String FINES_FILE = &quot;Fines.txt&quot;;
+
+    // ===== Fine Rules =====
+    private static final int BOOK_FINE_PER_DAY = 1;
+    private static final int CD_FINE_PER_DAY   = 2;
+
+<span class="fc" id="L19">    public static class FineRow {</span>
+        public String username;
+        public String mediaID;
+        public String mediaType;   // BOOK or CD
+        public long days;
+        public long amount;
+    }
+
+    private static void ensureFinesFile() {
+        try {
+<span class="fc" id="L29">            Path p = Paths.get(FINES_FILE);</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">            if (!Files.exists(p)) Files.createFile(p);</span>
+<span class="pc" id="L31">        } catch (Exception ignored) {}</span>
+<span class="fc" id="L32">    }</span>
+
+    // ===== Read all unpaid fines =====
+    public static List&lt;FineRow&gt; getUserUnpaidFines(String username) {
+<span class="fc" id="L36">        username = username.toLowerCase();</span>
+<span class="fc" id="L37">        List&lt;FineRow&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L39">        Path p = Paths.get(FINES_FILE);</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (!Files.exists(p)) return list;</span>
+
+        try {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            for (String line : Files.readAllLines(p)) {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">                if (line.trim().isEmpty()) continue;</span>
+<span class="fc" id="L45">                String[] f = line.split(Pattern.quote(SEP), -1);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">                if (f.length &gt;= 5) {</span>
+<span class="fc" id="L47">                    String u = f[0].trim().toLowerCase();</span>
+<span class="fc" id="L48">                    String returned = f[4].trim();</span>
+
+                    // unpaid only
+<span class="fc bfc" id="L51" title="All 4 branches covered.">                    if (u.equals(username) &amp;&amp; returned.equals(&quot;false&quot;)) {</span>
+<span class="fc" id="L52">                        FineRow fr = new FineRow();</span>
+<span class="fc" id="L53">                        fr.username = u;</span>
+<span class="fc" id="L54">                        fr.mediaID  = f[1].trim();</span>
+<span class="fc" id="L55">                        fr.mediaType= f[2].trim();</span>
+<span class="fc" id="L56">                        fr.days     = Long.parseLong(f[3].trim());</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">                        fr.amount   = fr.mediaType.equals(&quot;CD&quot;) ?</span>
+<span class="fc" id="L58">                                fr.days * CD_FINE_PER_DAY :</span>
+<span class="fc" id="L59">                                fr.days * BOOK_FINE_PER_DAY;</span>
+
+<span class="fc" id="L61">                        list.add(fr);</span>
+                    }
+                }
+<span class="fc" id="L64">            }</span>
+<span class="pc" id="L65">        } catch (Exception ignored) {}</span>
+
+<span class="fc" id="L67">        return list;</span>
+    }
+
+    // ===== Total unpaid fine amount =====
+    public static long getTotalUserFines(String username) {
+<span class="fc" id="L72">        long sum = 0;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (FineRow fr : getUserUnpaidFines(username))</span>
+<span class="fc" id="L74">            sum += fr.amount;</span>
+<span class="fc" id="L75">        return sum;</span>
+    }
+
+    // ===== Check if user has unpaid fines =====
+    public static boolean hasUnpaidFines(String username) {
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        return getTotalUserFines(username) &gt; 0;</span>
+    }
+
+    // ===== Generate fines from overdue loans =====
+    public static void generateFinesFromOverdueLoans() {
+<span class="fc" id="L85">        ensureFinesFile();</span>
+<span class="fc" id="L86">        Path p = Paths.get(LOANS_FILE);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (!Files.exists(p)) return;</span>
+
+<span class="fc" id="L89">        LocalDate today = LocalDate.now();</span>
+
+        try {
+<span class="fc" id="L92">            List&lt;String&gt; lines = Files.readAllLines(p);</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            for (String l : lines) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                if (l.trim().isEmpty()) continue;</span>
+<span class="fc" id="L95">                String[] a = l.split(Pattern.quote(SEP), -1);</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">                if (a.length &gt;= 5) {</span>
+<span class="fc" id="L98">                    String isbn  = a[0].trim();</span>
+<span class="fc" id="L99">                    String user  = a[1].trim().toLowerCase();</span>
+<span class="fc" id="L100">                    LocalDate due = LocalDate.parse(a[3].trim());</span>
+<span class="fc" id="L101">                    boolean returned = Boolean.parseBoolean(a[4].trim());</span>
+
+<span class="fc bfc" id="L103" title="All 4 branches covered.">                    if (!returned &amp;&amp; today.isAfter(due)) {</span>
+<span class="fc" id="L104">                        long days = ChronoUnit.DAYS.between(due, today);</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                        String type = isbn.startsWith(&quot;CD-&quot;) ? &quot;CD&quot; : &quot;BOOK&quot;;</span>
+
+<span class="fc" id="L107">                        String line = String.join(SEP,</span>
+                                user,
+                                isbn,
+                                type,
+<span class="fc" id="L111">                                Long.toString(days),</span>
+                                &quot;false&quot;     // unpaid
+                        );
+
+<span class="fc" id="L115">                        Files.write(Paths.get(FINES_FILE),</span>
+<span class="fc" id="L116">                                Arrays.asList(line),</span>
+                                StandardOpenOption.APPEND);
+                    }
+                }
+<span class="fc" id="L120">            }</span>
+<span class="pc" id="L121">        } catch (Exception ignored) {}</span>
+<span class="fc" id="L122">    }</span>
+
+    // ===== Mark all user fines as paid =====
+    public static void payAllUserFines(String username) {
+<span class="fc" id="L126">        username = username.toLowerCase();</span>
+<span class="fc" id="L127">        ensureFinesFile();</span>
+
+        try {
+<span class="fc" id="L130">            List&lt;String&gt; lines = Files.readAllLines(Paths.get(FINES_FILE));</span>
+<span class="fc" id="L131">            List&lt;String&gt; newLines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            for (String line : lines) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">                if (line.trim().isEmpty()) continue;</span>
+
+<span class="fc" id="L136">                String[] f = line.split(Pattern.quote(SEP), -1);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                if (f.length &gt;= 5) {</span>
+<span class="fc" id="L138">                    String u = f[0].trim().toLowerCase();</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">                    if (u.equals(username)) {</span>
+<span class="fc" id="L140">                        f[4] = &quot;true&quot;; // mark paid</span>
+                    }
+<span class="fc" id="L142">                    newLines.add(String.join(SEP, f));</span>
+                }
+<span class="fc" id="L144">            }</span>
+
+<span class="fc" id="L146">            Files.write(Paths.get(FINES_FILE), newLines);</span>
+<span class="pc" id="L147">        } catch (Exception ignored) {}</span>
+<span class="fc" id="L148">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

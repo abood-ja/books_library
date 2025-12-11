@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsAdminCDsMenuScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsAdminCDsMenuScreen.java</span></div><h1>clsAdminCDsMenuScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+public class clsAdminCDsMenuScreen extends clsScreen {
+
+    // -------------------------
+    // TEST MODE FLAG
+    // -------------------------
+    public static boolean TEST_MODE = false;
+
+<span class="fc" id="L10">    public enum enCDAdminMenuOptions {</span>
+<span class="fc" id="L11">        eList(1),</span>
+<span class="fc" id="L12">        eAdd(2),</span>
+<span class="fc" id="L13">        eFind(3),</span>
+<span class="fc" id="L14">        eDelete(4),</span>
+<span class="fc" id="L15">        eBack(5);</span>
+
+        private final int value;
+<span class="fc" id="L18">        enCDAdminMenuOptions(int value) { this.value = value; }</span>
+<span class="fc" id="L19">        public int getValue() { return value; }</span>
+    }
+
+    // -------------------------
+    // Show Screens (test-friendly)
+    // -------------------------
+    private static void _ShowCDsListScreen() {
+        if (TEST_MODE) {
+            System.out.print(&quot;list&quot;); // marker for testing
+        } else {
+            clsCDsListScreen.showCDsListScreen();
+        }
+    }
+
+    private static void _ShowAddNewCDScreen() {
+        if (TEST_MODE) {
+            System.out.print(&quot;add&quot;); // marker for testing
+        } else {
+            clsAddNewCDScreen.showAddNewCDScreen();
+        }
+    }
+
+    private static void _ShowFindCDScreen() {
+        if (TEST_MODE) {
+            System.out.print(&quot;find&quot;); // marker for testing
+        } else {
+            clsFindCDScreen.showFindCDScreen();
+        }
+    }
+
+    private static void _ShowDeleteCDScreen() {
+        if (TEST_MODE) {
+            System.out.print(&quot;delete&quot;); // marker for testing
+        } else {
+            clsDeleteCDScreen.showDeleteCDScreen();
+        }
+    }
+
+    // -------------------------
+    // Read option
+    // -------------------------
+    private static enCDAdminMenuOptions _ReadCDAdminMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose what do you want to do? [1 to 5]? &quot;);
+
+        int choice = clsInputValidate.readIntNumberBetween(1, 5, &quot;Enter number between 1 and 5!&quot;);
+
+        for (enCDAdminMenuOptions m : enCDAdminMenuOptions.values())
+            if (m.getValue() == choice)
+                return m;
+
+        return enCDAdminMenuOptions.eBack;
+    }
+
+    // -------------------------
+    // Go back
+    // -------------------------
+    private static void _GoBack() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;\nPress any key to go back...&quot;);
+        new java.util.Scanner(System.in).nextLine();
+        showCDAdminMenu();
+    }
+
+    // -------------------------
+    // Perform option
+    // -------------------------
+    private static void _PerformOption(enCDAdminMenuOptions option) {
+        switch (option) {
+
+            case eList:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowCDsListScreen();
+                if (!TEST_MODE) _GoBack();  // skip _GoBack in tests
+                break;
+
+            case eAdd:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowAddNewCDScreen();
+                if (!TEST_MODE) _GoBack();
+                break;
+
+            case eFind:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowFindCDScreen();
+                if (!TEST_MODE) _GoBack();
+                break;
+
+            case eDelete:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowDeleteCDScreen();
+                if (!TEST_MODE) _GoBack();
+                break;
+
+            case eBack:
+                break;
+        }
+    }
+
+    // -------------------------
+    // Show menu
+    // -------------------------
+    public static void showCDAdminMenu() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+
+        _DrawScreenHeader(&quot;\t\tCDs Admin Menu&quot;);
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] CDs List&quot;);
+        System.out.println(pad + &quot;\t[2] Add New CD&quot;);
+        System.out.println(pad + &quot;\t[3] Find CD&quot;);
+        System.out.println(pad + &quot;\t[4] Delete CD&quot;);
+        System.out.println(pad + &quot;\t[5] Back&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+
+        _PerformOption(_ReadCDAdminMenuOption());
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

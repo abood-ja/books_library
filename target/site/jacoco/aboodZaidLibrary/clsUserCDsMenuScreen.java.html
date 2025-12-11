@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsUserCDsMenuScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsUserCDsMenuScreen.java</span></div><h1>clsUserCDsMenuScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.regex.Pattern;
+
+public class clsUserCDsMenuScreen extends clsScreen {
+
+    private static final String SEP = &quot;#//#&quot;;
+    private static final String LOANS_FILE = &quot;Loans.txt&quot;;
+
+    private static void __ensureLoansFile() {
+        try {
+            Path p = Paths.get(LOANS_FILE);
+            if (Files.notExists(p)) Files.createFile(p);
+        } catch (IOException e) {
+            System.out.println(&quot;⚠️ Cannot create Loans file.&quot;);
+        }
+    }
+
+    private static void _BorrowCD() {
+        __ensureLoansFile();
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tBorrow CD&quot;);
+
+        if (clsUserSession.currentUser == null || clsUserSession.currentUser.isEmpty()) {
+            System.out.println(pad + &quot;❌ You must be logged in.&quot;);
+            return;
+        }
+
+        String username = clsUserSession.currentUser.getUserName().trim().toLowerCase();
+
+        if (__userHasOverdueCDs(username)) {
+            System.out.println(pad + &quot;❌ You cannot borrow a CD: you have overdue CDs.&quot;);
+            return;
+        }
+
+        System.out.print(pad + &quot;Enter CD ID: &quot;);
+        String cdid = clsInputValidate.readString().trim();
+
+        if (!clsCD.isCDExist(cdid)) {
+            System.out.println(pad + &quot;❌ CD not found.&quot;);
+            return;
+        }
+
+        if (__isCDCurrentlyBorrowed(cdid)) {
+            System.out.println(pad + &quot;❌ CD is already borrowed.&quot;);
+            return;
+        }
+
+        LocalDate borrow = LocalDate.now();
+        LocalDate due = borrow.plusDays(7);
+
+        String line = &quot;CD&quot; + SEP + cdid + SEP + username + SEP + borrow + SEP + due + SEP + &quot;false&quot;;
+
+        try {
+            Files.write(Paths.get(LOANS_FILE), Arrays.asList(line), StandardOpenOption.APPEND);
+            System.out.println(pad + &quot;✅ CD Borrowed Successfully! Due: &quot; + due);
+        } catch (IOException e) {
+            System.out.println(pad + &quot;❌ Failed to save loan.&quot;);
+        }
+    }
+
+    private static boolean __isCDCurrentlyBorrowed(String cdid) {
+        Path f = Paths.get(LOANS_FILE);
+        if (!Files.exists(f)) return false;
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(Pattern.quote(SEP));
+
+                if (p.length &gt;= 6) {
+                    String type = p[0].trim();
+                    String id = p[1].trim();
+                    boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                    if (type.equals(&quot;CD&quot;) &amp;&amp; id.equals(cdid) &amp;&amp; !returned)
+                        return true;
+                }
+            }
+        } catch (IOException e) {}
+
+        return false;
+    }
+
+    private static boolean __userHasOverdueCDs(String username) {
+        Path f = Paths.get(LOANS_FILE);
+        if (!Files.exists(f)) return false;
+
+        LocalDate today = LocalDate.now();
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(Pattern.quote(SEP));
+
+                if (p.length &gt;= 6) {
+                    String type = p[0].trim();
+                    String user = p[2].trim().toLowerCase();
+                    LocalDate due = LocalDate.parse(p[4].trim());
+                    boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                    if (type.equals(&quot;CD&quot;) &amp;&amp; user.equals(username) &amp;&amp; !returned &amp;&amp; today.isAfter(due))
+                        return true;
+                }
+            }
+        } catch (IOException e) {}
+
+        return false;
+    }
+
+
+    private static void _ReturnCD() {
+        __ensureLoansFile();
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tReturn CD&quot;);
+
+        if (clsUserSession.currentUser == null || clsUserSession.currentUser.isEmpty()) {
+            System.out.println(pad + &quot;❌ Login required.&quot;);
+            return;
+        }
+
+        String username = clsUserSession.currentUser.getUserName().trim().toLowerCase();
+
+        Path f = Paths.get(LOANS_FILE);
+
+
+        try {
+            List&lt;String&gt; lines = Files.readAllLines(f);
+            List&lt;Integer&gt; userLoans = new ArrayList&lt;&gt;();
+            int index = 1;
+
+            System.out.println(pad + &quot;Your borrowed CDs:&quot;);
+
+            for (int i = 0; i &lt; lines.size(); i++) {
+                String ln = lines.get(i).trim();
+                if (ln.isEmpty()) continue;
+
+                String[] p = ln.split(Pattern.quote(SEP));
+
+                if (p.length &gt;= 6) {
+                    String type = p[0].trim();
+                    String id = p[1].trim();
+                    String user = p[2].trim().toLowerCase();
+                    boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                    if (type.equals(&quot;CD&quot;) &amp;&amp; user.equals(username) &amp;&amp; !returned) {
+                        System.out.println(pad + index + &quot;. CD ID: &quot; + id + &quot; | Due: &quot; + p[4]);
+                        userLoans.add(i);
+                        index++;
+                    }
+                }
+            }
+
+            if (userLoans.isEmpty()) {
+                System.out.println(pad + &quot;No active borrowed CDs.&quot;);
+                return;
+            }
+
+            System.out.print(pad + &quot;Choose which CD to return: &quot;);
+            int choice = clsInputValidate.readIntNumberBetween(1, userLoans.size());
+
+            int lineIndex = userLoans.get(choice - 1);
+            String[] p = lines.get(lineIndex).split(Pattern.quote(SEP));
+            p[p.length - 1] = &quot;true&quot;;
+
+            lines.set(lineIndex, String.join(SEP, p));
+            Files.write(f, lines);
+
+            System.out.println(pad + &quot;✅ CD returned successfully!&quot;);
+
+        } catch (IOException e) {
+            System.out.println(pad + &quot;❌ Error updating file.&quot;);
+        }
+    }
+
+
+    private static void _MyOverdueCDs() {
+        __ensureLoansFile();
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tMy Overdue CDs&quot;);
+
+        if (clsUserSession.currentUser == null || clsUserSession.currentUser.isEmpty()) {
+            System.out.println(pad + &quot;❌ Login required.&quot;);
+            return;
+        }
+
+        String username = clsUserSession.currentUser.getUserName().trim().toLowerCase();
+        Path f = Paths.get(LOANS_FILE);
+
+        LocalDate today = LocalDate.now();
+        boolean found = false;
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(Pattern.quote(SEP));
+
+                if (p.length &gt;= 6) {
+                    String type = p[0].trim();
+                    String id = p[1].trim();
+                    String user = p[2].trim().toLowerCase();
+                    LocalDate due = LocalDate.parse(p[4].trim());
+                    boolean returned = Boolean.parseBoolean(p[p.length - 1].trim());
+
+                    if (type.equals(&quot;CD&quot;) &amp;&amp; user.equals(username)
+                            &amp;&amp; !returned &amp;&amp; today.isAfter(due)) {
+
+                        long days = ChronoUnit.DAYS.between(due, today);
+                        System.out.println(pad + &quot;- CD ID: &quot; + id + &quot; | Overdue by: &quot; + days + &quot; days&quot;);
+                        found = true;
+                    }
+                }
+            }
+        } catch (IOException ignored) {}
+
+        if (!found)
+            System.out.println(pad + &quot;No overdue CDs 👍&quot;);
+    }
+
+
+
+<span class="fc" id="L236">    public enum enCDMenuOptions {</span>
+<span class="fc" id="L237">        eList(1), eBorrow(2), eReturn(3), eOverdue(4), eFind(5), eBack(6);</span>
+
+        private final int value;
+<span class="fc" id="L240">        enCDMenuOptions(int value) { this.value = value; }</span>
+<span class="fc" id="L241">        public int getValue() { return value; }</span>
+    }
+
+    private static enCDMenuOptions _ReadCDMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose [1-6]: &quot;);
+        int choice = clsInputValidate.readIntNumberBetween(1, 6);
+
+        for (enCDMenuOptions o : enCDMenuOptions.values())
+            if (o.getValue() == choice) return o;
+
+        return enCDMenuOptions.eBack;
+    }
+
+    private static void _GoBackToMenu() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;\nPress any key to go back...&quot;);
+        new java.util.Scanner(System.in).nextLine();
+        showCDsMenu();
+    }
+
+    private static void _PerformOption(enCDMenuOptions option) {
+        switch (option) {
+            case eList:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                clsCDsListScreen.showCDsListScreen();
+                _GoBackToMenu();
+                break;
+
+            case eBorrow:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _BorrowCD();
+                _GoBackToMenu();
+                break;
+
+            case eReturn:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ReturnCD();
+                _GoBackToMenu();
+                break;
+
+            case eOverdue:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _MyOverdueCDs();
+                _GoBackToMenu();
+                break;
+
+            case eFind:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                clsFindCDScreen.showFindCDScreen();
+                _GoBackToMenu();
+                break;
+
+            case eBack:
+                break;
+        }
+    }
+
+    public static void showCDsMenu() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tCDs Menu&quot;);
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] CDs List&quot;);
+        System.out.println(pad + &quot;\t[2] Borrow CD&quot;);
+        System.out.println(pad + &quot;\t[3] Return CD&quot;);
+        System.out.println(pad + &quot;\t[4] My Overdue CDs&quot;);
+        System.out.println(pad + &quot;\t[5] Find CD&quot;);
+        System.out.println(pad + &quot;\t[6] Back&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+
+        _PerformOption(_ReadCDMenuOption());
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsAdminMainScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsAdminMainScreen.java</span></div><h1>clsAdminMainScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.nio.file.*;
+import java.util.*;
+
+public class clsAdminMainScreen extends clsScreen {
+
+<span class="fc" id="L8">    public enum enMainMenuOptions {</span>
+<span class="fc" id="L9">        eBooks(1),</span>
+<span class="fc" id="L10">        eCDs(2),</span>
+<span class="fc" id="L11">        eManageUsers(3),</span>
+<span class="fc" id="L12">        eSendReminders(4),</span>
+<span class="fc" id="L13">        eViewAllLoans(5),</span>
+<span class="fc" id="L14">        eLogout(6);</span>
+
+        private final int value;
+<span class="fc" id="L17">        enMainMenuOptions(int value) { this.value = value; }</span>
+<span class="fc" id="L18">        public int getValue() { return value; }</span>
+    }
+
+    public static enMainMenuOptions _ReadMainMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose what do you want to do? [1 to 6]? &quot;);
+
+        int choice = clsInputValidate.readIntNumberBetween(1, 6, &quot;Enter Number between 1 to 6? &quot;);
+
+        for (enMainMenuOptions o : enMainMenuOptions.values())
+            if (o.getValue() == choice)
+                return o;
+
+        return enMainMenuOptions.eLogout;
+    }
+    static void _ShowBooksMenu() {
+        clsAdminBooksMenuScreen.showBooksMenu();
+    }
+
+    private static void _ShowCDsMenu() {
+        clsAdminCDsMenuScreen.showCDAdminMenu();
+    }
+
+    private static void _ShowManageUsersMenu() {
+        clsManageUsersMenuScreen.showManageUsersMenu();
+    }
+
+    private static void _SendOverdueReminders() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tSend Overdue Reminders&quot;);
+
+        clsReminderService.sendOverdueRemindersNow();
+    }
+
+    private static void _ShowAllLoans() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tAll Active Loans&quot;);
+
+        Path path = Paths.get(&quot;Loans.txt&quot;);
+
+        if (!Files.exists(path)) {
+            System.out.println(&quot;\nNo loans found.&quot;);
+            return;
+        }
+
+        try {
+            List&lt;String&gt; lines = Files.readAllLines(path);
+
+            if (lines.isEmpty()) {
+                System.out.println(&quot;\nNo loans found.&quot;);
+                return;
+            }
+
+            System.out.printf(&quot;%-15s %-15s %-15s %-15s %-10s%n&quot;,
+                    &quot;Username&quot;, &quot;ISBN/CDID&quot;, &quot;Borrow&quot;, &quot;Due&quot;, &quot;Returned&quot;);
+
+            System.out.println(&quot;-----------------------------------------------------------------&quot;);
+
+            for (String line : lines) {
+                String[] p = line.split(&quot;#//#&quot;);
+                if (p.length &gt;= 5) {
+                    String isbn = p[0];
+                    String username = p[1];
+                    String borrowDate = p[2];
+                    String dueDate = p[3];
+                    String returned = p[4];
+
+                    System.out.printf(&quot;%-15s %-15s %-15s %-15s %-10s%n&quot;,
+                            username, isbn, borrowDate, dueDate, returned);
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println(&quot;\nError reading loans: &quot; + e.getMessage());
+        }
+    }
+
+    private static void _Logout() {
+        clsUserSession.currentUser = clsUser.find(&quot;&quot;, &quot;&quot;);
+    }
+
+    static void _GoBackToMainMenu() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;\nPress any key to go back to Main Menu...&quot;);
+        new java.util.Scanner(System.in).nextLine();
+        showMainMenu();
+    }
+
+
+
+    // ======================= PERFORM OPTION =========================
+
+    private static void _PerformMainMenuOption(enMainMenuOptions option) {
+
+        switch (option) {
+
+            case eBooks:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowBooksMenu();
+                _GoBackToMainMenu();
+                break;
+
+            case eCDs:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowCDsMenu();
+                _GoBackToMainMenu();
+                break;
+
+            case eManageUsers:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowManageUsersMenu();
+                _GoBackToMainMenu();
+                break;
+
+            case eSendReminders:
+                _SendOverdueReminders();
+                _GoBackToMainMenu();
+                break;
+
+            case eViewAllLoans:
+                _ShowAllLoans();
+                _GoBackToMainMenu();
+                break;
+
+            case eLogout:
+                _Logout();
+                break;
+        }
+    }
+
+    // ======================= MAIN MENU UI =========================
+
+    public static void showMainMenu() {
+
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tAdmin Main Menu&quot;);
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t\t\tMain Menu&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] Books Menu.&quot;);
+        System.out.println(pad + &quot;\t[2] CDs Menu.&quot;);
+        System.out.println(pad + &quot;\t[3] Manage Users Menu.&quot;);
+        System.out.println(pad + &quot;\t[4] Send Overdue Reminders.&quot;);
+        System.out.println(pad + &quot;\t[5] View All Loans.&quot;);
+        System.out.println(pad + &quot;\t[6] Logout.&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+
+        _PerformMainMenuOption(_ReadMainMenuOption());
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

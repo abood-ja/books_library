@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsUserMainScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsUserMainScreen.java</span></div><h1>clsUserMainScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+public class clsUserMainScreen extends clsScreen {
+
+<span class="fc" id="L5">    public enum enMainMenuOptions {</span>
+<span class="fc" id="L6">        eBooksMenu(1),</span>
+<span class="fc" id="L7">        eCDsMenu(2),</span>
+<span class="fc" id="L8">        ePayFines(3),</span>
+<span class="fc" id="L9">        eLogout(4);</span>
+
+        private final int value;
+<span class="fc" id="L12">        enMainMenuOptions(int value) { this.value = value; }</span>
+<span class="fc" id="L13">        public int getValue() { return value; }</span>
+    }
+
+    private static enMainMenuOptions _ReadMainMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose [1-4]: &quot;);
+
+        int choice = clsInputValidate.readIntNumberBetween(1, 4, &quot;Enter number between 1 and 4: &quot;);
+
+        for (enMainMenuOptions o : enMainMenuOptions.values())
+            if (o.getValue() == choice) return o;
+
+        return enMainMenuOptions.eLogout;
+    }
+
+    private static void _ShowBooksMenu() {
+            clsUserBooksMenuScreen.showBooksMenu();
+    }
+
+    private static void _ShowCDsMenu() {
+
+
+            clsUserCDsMenuScreen.showCDsMenu();
+
+    }
+
+    private static void _ShowPayFinesScreen() {
+
+            clsPayFineScreen.showPayFineScreen();
+
+    }
+    private static void _Logout() {
+            clsUserSession.currentUser = clsUser.find(&quot;&quot;, &quot;&quot;);
+    }
+    private static void _PerformMainMenuOption(enMainMenuOptions option) {
+        switch(option) {
+            case eBooksMenu:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowBooksMenu();
+                showMainMenu();
+                break;
+
+            case eCDsMenu:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowCDsMenu();
+                showMainMenu();
+                break;
+
+            case ePayFines:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowPayFinesScreen();
+                showMainMenu();
+                break;
+
+            case eLogout:
+                _Logout();
+                break;
+        }
+    }
+
+    public static void showMainMenu() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tUser Main Menu&quot;);
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t\t\tUser Main Menu&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] Books Menu.&quot;);
+        System.out.println(pad + &quot;\t[2] CDs Menu.&quot;);
+        System.out.println(pad + &quot;\t[3] Pay Fines.&quot;);   // &lt;-- فقط هنا
+        System.out.println(pad + &quot;\t[4] Logout.&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+
+        _PerformMainMenuOption(_ReadMainMenuOption());
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

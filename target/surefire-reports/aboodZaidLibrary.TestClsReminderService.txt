@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: aboodZaidLibrary.TestClsReminderService
 -------------------------------------------------------------------------------
-Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.25 s -- in aboodZaidLibrary.TestClsReminderService
+Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 29.85 s - in aboodZaidLibrary.TestClsReminderService

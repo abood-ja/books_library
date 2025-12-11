@@ -1,99 +1,47 @@
 -------------------------------------------------------------------------------
 Test set: aboodZaidLibrary.TestClsAdminBooksMenuScreen
 -------------------------------------------------------------------------------
-Tests run: 10, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.071 s <<< FAILURE! -- in aboodZaidLibrary.TestClsAdminBooksMenuScreen
-aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowDeleteBookScreen_NoExceptions -- Time elapsed: 0.016 s <<< FAILURE!
+Tests run: 10, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.3 s <<< FAILURE! - in aboodZaidLibrary.TestClsAdminBooksMenuScreen
+test_ShowDeleteBookScreen_NoExceptions  Time elapsed: 0.144 s  <<< FAILURE!
 org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
-	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:53)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:36)
-	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3164)
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowDeleteBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:128)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
 Caused by: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowDeleteBookScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:132)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:49)
-	... 6 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowDeleteBookScreen_NoExceptions$2(TestClsAdminBooksMenuScreen.java:132)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowDeleteBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:128)
 Caused by: java.lang.reflect.InvocationTargetException
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:116)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowDeleteBookScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:130)
-	... 7 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowDeleteBookScreen_NoExceptions$2(TestClsAdminBooksMenuScreen.java:130)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowDeleteBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:128)
 Caused by: java.lang.NullPointerException: Cannot invoke "aboodZaidLibrary.clsUser.checkAccessPermission(aboodZaidLibrary.clsUser$enPermissions)" because "aboodZaidLibrary.clsUserSession.currentUser" is null
-	at aboodZaidLibrary.clsScreen.CheckAccessRights(clsScreen.java:30)
-	at aboodZaidLibrary.clsDeleteBookScreen.showDeleteBookScreen(clsDeleteBookScreen.java:13)
-	at aboodZaidLibrary.clsAdminBooksMenuScreen._ShowDeleteBookScreen(clsAdminBooksMenuScreen.java:48)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-	... 9 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowDeleteBookScreen_NoExceptions$2(TestClsAdminBooksMenuScreen.java:130)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowDeleteBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:128)
 
-aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowAddBookScreen_NoExceptions -- Time elapsed: 0.004 s <<< FAILURE!
+test_ShowAddBookScreen_NoExceptions  Time elapsed: 0.008 s  <<< FAILURE!
 org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
-	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:53)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:36)
-	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3164)
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowAddBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:113)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
 Caused by: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowAddBookScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:117)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:49)
-	... 6 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowAddBookScreen_NoExceptions$1(TestClsAdminBooksMenuScreen.java:117)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowAddBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:113)
 Caused by: java.lang.reflect.InvocationTargetException
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:116)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowAddBookScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:115)
-	... 7 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowAddBookScreen_NoExceptions$1(TestClsAdminBooksMenuScreen.java:115)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowAddBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:113)
 Caused by: java.lang.NullPointerException: Cannot invoke "aboodZaidLibrary.clsUser.isEmpty()" because "aboodZaidLibrary.clsUserSession.currentUser" is null
-	at aboodZaidLibrary.clsScreen._DrawScreenHeader(clsScreen.java:18)
-	at aboodZaidLibrary.clsScreen._DrawScreenHeader(clsScreen.java:27)
-	at aboodZaidLibrary.clsAddNewBookScreen.showAddNewBookScreen(clsAddNewBookScreen.java:56)
-	at aboodZaidLibrary.clsAdminBooksMenuScreen._ShowAddBookScreen(clsAdminBooksMenuScreen.java:45)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-	... 9 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowAddBookScreen_NoExceptions$1(TestClsAdminBooksMenuScreen.java:115)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowAddBookScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:113)
 
-aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_showBooksMenu_PrintsMenu -- Time elapsed: 0.004 s <<< FAILURE!
+test_showBooksMenu_PrintsMenu  Time elapsed: 0.01 s  <<< FAILURE!
 org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
-	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
-	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
-	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
-	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
-	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:179)
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_showBooksMenu_PrintsMenu(TestClsAdminBooksMenuScreen.java:177)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
 
-aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowBooksListScreen_NoExceptions -- Time elapsed: 0.013 s <<< FAILURE!
+test_ShowBooksListScreen_NoExceptions  Time elapsed: 0.108 s  <<< FAILURE!
 org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
-	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:53)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:36)
-	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3164)
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowBooksListScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:96)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
 Caused by: java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowBooksListScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:100)
-	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:49)
-	... 6 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowBooksListScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:96)
 Caused by: java.lang.reflect.InvocationTargetException
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:116)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
 	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowBooksListScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:98)
-	... 7 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowBooksListScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:96)
 Caused by: java.lang.NullPointerException: Cannot invoke "aboodZaidLibrary.clsUser.isEmpty()" because "aboodZaidLibrary.clsUserSession.currentUser" is null
-	at aboodZaidLibrary.clsScreen._DrawScreenHeader(clsScreen.java:18)
-	at aboodZaidLibrary.clsBooksListScreen.showBooksListScreen(clsBooksListScreen.java:21)
-	at aboodZaidLibrary.clsAdminBooksMenuScreen._ShowBooksListScreen(clsAdminBooksMenuScreen.java:39)
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
-	... 9 more
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.lambda$test_ShowBooksListScreen_NoExceptions$0(TestClsAdminBooksMenuScreen.java:98)
+	at aboodZaidLibrary.TestClsAdminBooksMenuScreen.test_ShowBooksListScreen_NoExceptions(TestClsAdminBooksMenuScreen.java:96)
 

@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsDate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsDate.java</span></div><h1>clsDate.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+import java.time.LocalDate;
+import java.lang.String;  
+
+public class clsDate {
+    
+<span class="fc" id="L7">    private int _Day = 1;</span>
+<span class="fc" id="L8">    private int _Month = 1;</span>
+<span class="fc" id="L9">    private int _Year = 1900;</span>
+
+    
+<span class="fc" id="L12">    public clsDate() {</span>
+<span class="fc" id="L13">        LocalDate today = LocalDate.now();</span>
+<span class="fc" id="L14">        _Day = today.getDayOfMonth();</span>
+<span class="fc" id="L15">        _Month = today.getMonthValue();</span>
+<span class="fc" id="L16">        _Year = today.getYear();</span>
+<span class="fc" id="L17">    }</span>
+<span class="fc" id="L18">    public clsDate(clsDate date) {</span>
+    	
+<span class="fc" id="L20">        this._Day = date._Day;</span>
+<span class="fc" id="L21">        this._Month = date._Month;</span>
+<span class="fc" id="L22">        this._Year = date._Year;</span>
+<span class="fc" id="L23">    }</span>
+<span class="fc" id="L24">    public clsDate(String sDate) {</span>
+<span class="fc" id="L25">        String[] vDate = sDate.split(&quot;/&quot;);</span>
+        int day, month, year;
+        try {
+<span class="fc" id="L28">            day = Integer.parseInt(vDate[0]);</span>
+<span class="fc" id="L29">            month = Integer.parseInt(vDate[1]);</span>
+<span class="fc" id="L30">            year = Integer.parseInt(vDate[2]);</span>
+<span class="fc" id="L31">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L32">            throw new IllegalArgumentException(&quot;Day, month, and year must be valid integers. Given: &quot; + sDate);</span>
+<span class="fc" id="L33">        }</span>
+
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+<span class="fc bfc" id="L36" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L37">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L40">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+<span class="fc" id="L44">        int maxDays = clsDate.numberOfDaysInAMonth(month, year);</span>
+
+<span class="fc bfc" id="L46" title="All 4 branches covered.">        if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L47">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+
+<span class="fc" id="L50">        _Day = day;</span>
+<span class="fc" id="L51">        _Month = month;</span>
+<span class="fc" id="L52">        _Year = year;</span>
+<span class="fc" id="L53">    }</span>
+<span class="fc" id="L54">    public clsDate(int day, int month, int year) {</span>
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L57">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L60">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+<span class="fc" id="L64">        int maxDays = clsDate.numberOfDaysInAMonth(month, year);</span>
+
+<span class="fc bfc" id="L66" title="All 4 branches covered.">        if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L67">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+
+<span class="fc" id="L70">        _Day = day;</span>
+<span class="fc" id="L71">        _Month = month;</span>
+<span class="fc" id="L72">        _Year = year;</span>
+<span class="fc" id="L73">    }</span>
+    public int getDay() {
+<span class="fc" id="L75">        return _Day;</span>
+    }
+
+    public int getMonth() {
+<span class="fc" id="L79">        return _Month;</span>
+    }
+
+    public int getYear() {
+<span class="fc" id="L83">        return _Year;</span>
+    }
+
+    public void setDay(int day) {
+<span class="fc" id="L87">    	int maxDays = clsDate.numberOfDaysInAMonth(this._Month, this._Year);</span>
+<span class="fc bfc" id="L88" title="All 4 branches covered.">    	if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L89">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+<span class="fc" id="L91">        _Day = day;</span>
+<span class="fc" id="L92">    }</span>
+
+    public void setMonth(int month) {
+<span class="fc bfc" id="L95" title="All 4 branches covered.">    	 if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L96">             throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+         }
+<span class="fc" id="L98">        _Month = month;</span>
+<span class="fc" id="L99">    }</span>
+
+    public void setYear(int year) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    	 if (year&lt;1) {</span>
+<span class="fc" id="L103">        	 throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+         }
+<span class="fc" id="L105">        _Year = year;</span>
+<span class="fc" id="L106">    }</span>
+
+    public static boolean isLeapYear(int year) {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    	 if (year&lt;1) {</span>
+<span class="fc" id="L110">        	 throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+         }
+<span class="fc bfc" id="L112" title="All 6 branches covered.">        return (year % 4 == 0 &amp;&amp; year % 100 != 0) || (year % 400 == 0);</span>
+    }
+    public static clsDate getSystemDate() {
+<span class="fc" id="L115">        java.time.LocalDate now = java.time.LocalDate.now();</span>
+
+<span class="fc" id="L117">        int day = now.getDayOfMonth();</span>
+<span class="fc" id="L118">        int month = now.getMonthValue();</span>
+<span class="fc" id="L119">        int year = now.getYear();</span>
+
+<span class="fc" id="L121">        return new clsDate(day, month, year);</span>
+    }
+ 
+    public static String getSystemDateTimeString() {
+<span class="fc" id="L125">        java.time.LocalDateTime now = java.time.LocalDateTime.now();</span>
+
+<span class="fc" id="L127">        int day = now.getDayOfMonth();</span>
+<span class="fc" id="L128">        int month = now.getMonthValue();</span>
+<span class="fc" id="L129">        int year = now.getYear();</span>
+<span class="fc" id="L130">        int hour = now.getHour();</span>
+<span class="fc" id="L131">        int minute = now.getMinute();</span>
+<span class="fc" id="L132">        int second = now.getSecond();</span>
+
+<span class="fc" id="L134">        return String.format(&quot;%02d/%02d/%04d - %02d:%02d:%02d&quot;,</span>
+<span class="fc" id="L135">                             day, month, year, hour, minute, second);</span>
+    }
+    public static String DateToString(clsDate date) {
+<span class="fc" id="L138">        return date.getDay() + &quot;/&quot; + date.getMonth() + &quot;/&quot; + date.getYear();</span>
+    }
+    public String DateToString()
+    {
+<span class="fc" id="L142">    	return  DateToString(this);</span>
+    }
+    public boolean isLeapYear() {
+<span class="fc" id="L145">        return isLeapYear(_Year);</span>
+    }
+    public static int numberOfDaysInAYear(int year)
+	{
+<span class="fc bfc" id="L149" title="All 2 branches covered.">    	 if (year&lt;1) {</span>
+<span class="fc" id="L150">        	 throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+         }
+<span class="fc bfc" id="L152" title="All 2 branches covered.">		return  isLeapYear(year) ? 366 : 365;</span>
+	}
+
+    public int numberOfDaysInAYear()
+	{
+<span class="fc" id="L157">		return  numberOfDaysInAYear(_Year);</span>
+	}
+    public static int numberOfHoursInAYear(int year) {
+        // Validate year FIRST, before calling numberOfDaysInAYear
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L162">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+<span class="fc" id="L164">        return numberOfDaysInAYear(year) * 24;</span>
+    }
+
+
+	public int numberOfHoursInAYear()
+	{
+<span class="fc" id="L170">		return  numberOfHoursInAYear(_Year);</span>
+	}
+    public static int numberOfMinutesInAYear(int year) {
+        // Validate year FIRST, before calling numberOfHoursInAYear
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L175">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+<span class="fc" id="L177">        return numberOfHoursInAYear(year) * 60;</span>
+    }
+
+	public int numberOfMinutesInAYear()
+	{
+<span class="fc" id="L182">		return  numberOfMinutesInAYear(_Year);</span>
+	}
+
+    public static int numberOfSecondsInAYear(int year) {
+        // Validate year FIRST, before calling numberOfMinutesInAYear
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L188">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+<span class="fc" id="L190">        return numberOfMinutesInAYear(year) * 60;</span>
+    }
+	
+	public int numberOfSecondsInAYear()
+	{
+<span class="fc" id="L195">		return  numberOfSecondsInAYear(_Year);</span>
+	}
+	
+	public static int numberOfDaysInAMonth(int month, int year)
+	{
+
+<span class="fc bfc" id="L201" title="All 4 branches covered.">		if (month &lt; 1 || month&gt;12)</span>
+			{
+<span class="fc" id="L203">			throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+			}
+
+<span class="fc" id="L206">		int days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };</span>
+<span class="fc bfc" id="L207" title="All 4 branches covered.">		return (month == 2) ? (isLeapYear(year) ? 29 : 28) : days[month - 1];</span>
+
+	}
+
+	public int numberOfDaysInAMonth()
+	{
+<span class="fc" id="L213">		return numberOfDaysInAMonth(_Month, _Year);</span>
+	}
+   
+	
+	public static int numberOfHoursInAMonth(int month, int year)
+	{
+<span class="fc" id="L219">		return  numberOfDaysInAMonth(month, year) * 24;</span>
+	}
+
+	public int numberOfHoursInAMonth()
+	{
+<span class="fc" id="L224">		return  numberOfDaysInAMonth(_Month, _Year) * 24;</span>
+	}
+	
+	public static int numberOfMinutesInAMonth(int month, int year)
+	{
+<span class="fc" id="L229">		return  numberOfHoursInAMonth(month, year) * 60;</span>
+	}
+
+	public int numberOfMinutesInAMonth()
+	{
+<span class="fc" id="L234">		return  numberOfHoursInAMonth(_Month, _Year) * 60;</span>
+	}
+	
+	public static int numberOfSecondsInAMonth(int month, int year)
+	{
+<span class="fc" id="L239">		return  numberOfMinutesInAMonth(month, year) * 60;</span>
+	}
+
+	public int numberOfSecondsInAMonth()
+	{
+<span class="fc" id="L244">		return  numberOfMinutesInAMonth(_Month, _Year) * 60;</span>
+	}
+
+    public static int dayOfWeekOrder(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+<span class="fc bfc" id="L249" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L250">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L252" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L253">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+<span class="fc" id="L257">        int maxDays = clsDate.numberOfDaysInAMonth(month, year);</span>
+
+<span class="fc bfc" id="L259" title="All 4 branches covered.">        if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L260">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+
+        int a, y, m;
+<span class="fc" id="L264">        a = (14 - month) / 12;</span>
+<span class="fc" id="L265">        y = year - a;</span>
+<span class="fc" id="L266">        m = month + (12 * a) - 2;</span>
+
+<span class="fc" id="L268">        return (day + y + (y / 4) - (y / 100) + (y / 400) + ((31 * m) / 12)) % 7;</span>
+    }
+
+	public int dayOfWeekOrder()
+	{
+<span class="fc" id="L273">		return dayOfWeekOrder(_Day, _Month, _Year);</span>
+	}
+	
+	public static String dayShortName(int dayOfWeekOrder)
+	{
+<span class="fc bfc" id="L278" title="All 4 branches covered.">		if(dayOfWeekOrder&gt;6||dayOfWeekOrder&lt;0) {</span>
+<span class="fc" id="L279">			throw new IllegalArgumentException(&quot;day must be from 0 to 6  . Given: &quot; + dayOfWeekOrder);</span>
+		}
+<span class="fc" id="L281">		String arrDayNames[] = { &quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot; };</span>
+
+<span class="fc" id="L283">		return arrDayNames[dayOfWeekOrder];</span>
+
+	}
+
+    public static String dayShortName(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+<span class="fc bfc" id="L289" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L290">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L292" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L293">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+<span class="fc" id="L297">        int maxDays = clsDate.numberOfDaysInAMonth(month, year);</span>
+
+<span class="fc bfc" id="L299" title="All 4 branches covered.">        if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L300">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+
+<span class="fc" id="L303">        String arrDayNames[] = { &quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot; };</span>
+
+<span class="fc" id="L305">        return arrDayNames[dayOfWeekOrder(day, month, year)];</span>
+    }
+
+	public String dayShortName()
+	{
+
+<span class="fc" id="L311">		String arrDayNames[] = { &quot;Sun&quot;,&quot;Mon&quot;,&quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fri&quot;,&quot;Sat&quot; };</span>
+<span class="fc" id="L312">		return arrDayNames[dayOfWeekOrder(_Day, _Month, _Year)];</span>
+
+	}
+	
+	public static String monthShortName(int monthNumber)
+	{
+		
+<span class="fc bfc" id="L319" title="All 4 branches covered.">        if (monthNumber &lt; 1 || monthNumber &gt; 12) {</span>
+<span class="fc" id="L320">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + monthNumber);</span>
+        }
+        
+<span class="fc" id="L323">		String months[] = { &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;,</span>
+						   &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;,
+						   &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;,
+						   &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;
+		};
+
+<span class="fc" id="L329">		return (months[monthNumber - 1]);</span>
+	}
+
+	public String monthShortName()
+	{
+
+<span class="fc" id="L335">		return monthShortName(_Month);</span>
+	}
+	
+	public static void printMonthCalendar(int month, int year) {
+        int numberOfDays;
+<span class="fc bfc" id="L340" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L341">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L343" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L344">       	 throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+        // Index of the day from 0 to 6
+<span class="fc" id="L347">        int current = dayOfWeekOrder(1, month, year);</span>
+        
+<span class="fc" id="L349">        numberOfDays = numberOfDaysInAMonth(month, year);</span>
+<span class="fc" id="L350">        System.out.printf(&quot;\n  _______________%s_______________\n\n&quot;, monthShortName(month));</span>
+<span class="fc" id="L351">        System.out.println(&quot;  Sun  Mon  Tue  Wed  Thu  Fri  Sat&quot;);</span>
+        int i;
+<span class="fc bfc" id="L353" title="All 2 branches covered.">        for (i = 0; i &lt; current; i++) {</span>
+<span class="fc" id="L354">            System.out.print(&quot;     &quot;);</span>
+        }
+<span class="fc bfc" id="L356" title="All 2 branches covered.">        for (int j = 1; j &lt;= numberOfDays; j++) {</span>
+<span class="fc" id="L357">            System.out.printf(&quot;%5d&quot;, j);</span>
+
+<span class="fc bfc" id="L359" title="All 2 branches covered.">            if (++i == 7) {</span>
+<span class="fc" id="L360">                i = 0;</span>
+<span class="fc" id="L361">                System.out.println();</span>
+            }
+        }
+<span class="fc" id="L364">        System.out.println(&quot;\n  _________________________________&quot;);</span>
+<span class="fc" id="L365">    }</span>
+	
+	
+	public void printMonthCalendar()
+	{
+<span class="fc" id="L370">		printMonthCalendar(_Month, _Year);</span>
+<span class="fc" id="L371">	}</span>
+	
+	public static void printYearCalendar(int year) {
+<span class="fc bfc" id="L374" title="All 2 branches covered.">		if (year &lt; 1) {</span>
+<span class="fc" id="L375">	       	 throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+	        }
+<span class="fc" id="L377">        System.out.println(&quot;\n  _________________________________\n&quot;);</span>
+<span class="fc" id="L378">        System.out.printf(&quot;           Calendar - %d\n&quot;, year);</span>
+<span class="fc" id="L379">        System.out.println(&quot;  _________________________________\n&quot;);</span>
+
+<span class="fc bfc" id="L381" title="All 2 branches covered.">        for (int i = 1; i &lt;= 12; i++) {</span>
+<span class="fc" id="L382">            printMonthCalendar(i, year);</span>
+        }
+<span class="fc" id="L384">    }</span>
+	
+	public void printYearCalendar() {
+<span class="fc" id="L387">        System.out.println(&quot;\n  _________________________________\n&quot;);</span>
+<span class="fc" id="L388">        System.out.printf(&quot;           Calendar - %d\n&quot;, _Year);</span>
+<span class="fc" id="L389">        System.out.println(&quot;  _________________________________\n&quot;);</span>
+
+<span class="fc bfc" id="L391" title="All 2 branches covered.">        for (int i = 1; i &lt;= 12; i++) {</span>
+<span class="fc" id="L392">            printMonthCalendar(i, _Year);</span>
+        }
+<span class="fc" id="L394">    }</span>
+    public static int daysFromTheBeginningOfTheYear(int day, int month, int year) {
+        // Validate month and year FIRST, before calling numberOfDaysInAMonth
+<span class="fc bfc" id="L397" title="All 4 branches covered.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="fc" id="L398">            throw new IllegalArgumentException(&quot;Month must be between 1 and 12. Given: &quot; + month);</span>
+        }
+<span class="fc bfc" id="L400" title="All 2 branches covered.">        if (year &lt; 1) {</span>
+<span class="fc" id="L401">            throw new IllegalArgumentException(&quot;Year must be bigger than  0. Given: &quot; + year);</span>
+        }
+
+        // Now get maxDays (this will not throw since we already validated)
+<span class="fc" id="L405">        int maxDays = clsDate.numberOfDaysInAMonth(month, year);</span>
+
+<span class="fc bfc" id="L407" title="All 4 branches covered.">        if (day &lt; 1 || day &gt; maxDays) {</span>
+<span class="fc" id="L408">            throw new IllegalArgumentException(&quot;Day must be between 1 and &quot; + maxDays + &quot;. Given: &quot; + day);</span>
+        }
+
+<span class="fc" id="L411">        int totalDays = 0;</span>
+
+<span class="fc bfc" id="L413" title="All 2 branches covered.">        for (int i = 1; i &lt; month; i++) {</span>
+<span class="fc" id="L414">            totalDays += numberOfDaysInAMonth(i, year);</span>
+        }
+
+<span class="fc" id="L417">        totalDays += day;</span>
+
+<span class="fc" id="L419">        return totalDays;</span>
+    }
+
+	public int daysFromTheBeginningOfTheYear() {
+<span class="fc" id="L423">	    int totalDays = 0;</span>
+<span class="fc bfc" id="L424" title="All 2 branches covered.">	    for (int i = 1; i &lt; _Month; i++) {</span>
+<span class="fc" id="L425">	        totalDays += numberOfDaysInAMonth(i, _Year);</span>
+	    }
+
+<span class="fc" id="L428">	    totalDays += _Day;</span>
+
+<span class="fc" id="L430">	    return totalDays;</span>
+	}
+	
+	public static clsDate getDateFromDayOrderInYear(int dateOrderInYear, int year) {
+<span class="fc" id="L434">	    clsDate date = new clsDate();</span>
+<span class="fc" id="L435">	    int remainingDays = dateOrderInYear;</span>
+<span class="fc" id="L436">	    int monthDays = 0;</span>
+
+<span class="fc" id="L438">	    date.setYear(year); </span>
+<span class="fc" id="L439">	    date.setMonth(1);</span>
+
+	    while (true) {
+<span class="fc" id="L442">	        monthDays = numberOfDaysInAMonth(date.getMonth(), year);</span>
+
+<span class="fc bfc" id="L444" title="All 2 branches covered.">	        if (remainingDays &gt; monthDays) {</span>
+<span class="fc" id="L445">	            remainingDays -= monthDays;</span>
+<span class="fc" id="L446">	            date.setMonth(date.getMonth()+1);</span>
+	        } else {
+<span class="fc" id="L448">	            date.setDay(remainingDays);</span>
+<span class="fc" id="L449">	            break;</span>
+	        }
+	    }
+
+<span class="fc" id="L453">	    return date;</span>
+	}
+	
+	
+	public void addDays(int days) {
+<span class="fc bfc" id="L458" title="All 2 branches covered.">		if (days&lt;0) {</span>
+<span class="fc" id="L459">           throw new IllegalArgumentException(&quot;days must be positive. Given: &quot; + days);</span>
+		}
+<span class="fc" id="L461">	    int remainingDays = days + daysFromTheBeginningOfTheYear(_Day, _Month, _Year);</span>
+<span class="fc" id="L462">	    int monthDays = 0;</span>
+
+<span class="fc" id="L464">	    _Month = 1;</span>
+
+	    while (true) {
+<span class="fc" id="L467">	        monthDays = numberOfDaysInAMonth(_Month, _Year);</span>
+
+<span class="fc bfc" id="L469" title="All 2 branches covered.">	        if (remainingDays &gt; monthDays) {</span>
+<span class="fc" id="L470">	            remainingDays -= monthDays;</span>
+<span class="fc" id="L471">	            _Month++;</span>
+
+<span class="fc bfc" id="L473" title="All 2 branches covered.">	            if (_Month &gt; 12) {</span>
+<span class="fc" id="L474">	                _Month = 1;</span>
+<span class="fc" id="L475">	                _Year++;</span>
+	            }
+	        } else {
+<span class="fc" id="L478">	            _Day = remainingDays;</span>
+<span class="fc" id="L479">	            break;</span>
+	        }
+	    }
+<span class="fc" id="L482">	}</span>
+	
+	
+	public static boolean isDate1BeforeDate2(clsDate date1, clsDate date2) {
+<span class="fc bfc" id="L486" title="All 2 branches covered.">	    return (date1.getYear() &lt; date2.getYear()) </span>
+<span class="fc" id="L487">	        ? true </span>
+<span class="fc bfc" id="L488" title="All 2 branches covered.">	        : (date1.getYear() == date2.getYear() </span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">	            ? (date1.getMonth() &lt; date2.getMonth() </span>
+<span class="fc" id="L490">	                ? true </span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">	                : (date1.getMonth() == date2.getMonth() </span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">	                    ? date1.getDay() &lt; date2.getDay() </span>
+<span class="fc" id="L493">	                    : false)) </span>
+<span class="fc" id="L494">	            : false);</span>
+	}
+	
+	public boolean isDateBeforeDate2(clsDate date2) {
+	 
+<span class="fc" id="L499">	    return isDate1BeforeDate2(this, date2);</span>
+	}
+	
+	public static boolean isDate1EqualDate2(clsDate date1, clsDate date2) {
+<span class="fc bfc" id="L503" title="All 2 branches covered.">	    return (date1.getYear() == date2.getYear()) </span>
+<span class="fc bfc" id="L504" title="All 2 branches covered.">	        ? (date1.getMonth() == date2.getMonth() </span>
+<span class="fc bfc" id="L505" title="All 2 branches covered.">	            ? (date1.getDay() == date2.getDay() </span>
+<span class="fc" id="L506">	                ? true </span>
+<span class="fc" id="L507">	                : false) </span>
+<span class="fc" id="L508">	            : false) </span>
+<span class="fc" id="L509">	        : false;</span>
+	}
+	public boolean isDateEqualDate2(clsDate date2) {
+<span class="fc" id="L512">	    return isDate1EqualDate2(this, date2);</span>
+	}
+	
+	public static int getDifferenceInDays(clsDate date1, clsDate date2) {
+	    
+<span class="fc" id="L517">	    clsDate d1 = new clsDate(date1);</span>
+<span class="fc" id="L518">	    clsDate d2 = new clsDate(date2);</span>
+
+<span class="fc" id="L520">	    int days = 0;</span>
+<span class="fc" id="L521">	    int swapFlag = 1;</span>
+
+<span class="fc bfc" id="L523" title="All 2 branches covered.">	    if (!clsDate.isDate1BeforeDate2(d1, d2)) {</span>
+<span class="fc" id="L524">	        clsDate temp = d1;</span>
+<span class="fc" id="L525">	        d1 = d2;</span>
+<span class="fc" id="L526">	        d2 = temp;</span>
+<span class="fc" id="L527">	        swapFlag = -1;</span>
+	    }
+
+	    // Count days
+<span class="fc bfc" id="L531" title="All 2 branches covered.">	    while (clsDate.isDate1BeforeDate2(d1, d2)) {</span>
+<span class="fc" id="L532">	        d1.addDays(1);</span>
+<span class="fc" id="L533">	        days++;</span>
+	    }
+
+	 
+<span class="fc" id="L537">	    return days * swapFlag;</span>
+	}
+	
+	public int getDifferenceInDays(clsDate date2)
+	{
+<span class="fc" id="L542">		return getDifferenceInDays(this, date2);</span>
+	}
+	
+	
+
+}
+	
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

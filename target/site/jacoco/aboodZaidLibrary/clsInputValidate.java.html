@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsInputValidate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsInputValidate.java</span></div><h1>clsInputValidate.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.util.Scanner;
+
+<span class="nc" id="L5">public class clsInputValidate {</span>
+
+<span class="fc" id="L7">    private static Scanner testScanner = null; // Scanner for testing</span>
+
+    // Set a test Scanner (used in unit tests)
+    public static void setTestScanner(Scanner sc) {
+<span class="fc" id="L11">        testScanner = sc;</span>
+<span class="fc" id="L12">    }</span>
+
+    // Get the current Scanner (test or real System.in)
+    private static Scanner getScanner() {
+<span class="fc bfc" id="L16" title="All 2 branches covered.">        return (testScanner != null) ? testScanner : new Scanner(System.in);</span>
+    }
+
+    public static int readIntNumber(String errorMessage) {
+<span class="fc" id="L20">        Scanner scanner = getScanner();</span>
+        int number;
+
+        while (true) {
+            try {
+<span class="fc" id="L25">                number = Integer.parseInt(scanner.nextLine());</span>
+<span class="fc" id="L26">                break;</span>
+<span class="fc" id="L27">            } catch (NumberFormatException e) {</span>
+<span class="fc" id="L28">                System.out.print(errorMessage);</span>
+<span class="fc" id="L29">            }</span>
+        }
+
+<span class="fc" id="L32">        return number;</span>
+    }
+
+    public static int readIntNumber() {
+<span class="fc" id="L36">        return readIntNumber(&quot;Invalid Number, Enter again\n&quot;);</span>
+    }
+
+    public static int readIntNumberBetween(int from, int to, String errorMessage) {
+<span class="fc" id="L40">        int number = readIntNumber();</span>
+
+<span class="fc bfc" id="L42" title="All 4 branches covered.">        while (number &lt; from || number &gt; to) {</span>
+<span class="fc" id="L43">            System.out.print(errorMessage);</span>
+<span class="fc" id="L44">            number = readIntNumber();</span>
+        }
+
+<span class="fc" id="L47">        return number;</span>
+    }
+
+    public static int readIntNumberBetween(int from, int to) {
+<span class="fc" id="L51">        return readIntNumberBetween(from, to, &quot;Number is not within range, Enter again:\n&quot;);</span>
+    }
+
+    public static String readString() {
+<span class="fc" id="L55">        Scanner scanner = getScanner();</span>
+<span class="fc" id="L56">        return scanner.nextLine();</span>
+    }
+
+    public static char readChar() {
+<span class="fc" id="L60">        String input = readString();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (input.isEmpty()) return '\0';</span>
+<span class="fc" id="L62">        return input.charAt(0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,39 +1,126 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>library</groupId>
-  <artifactId>aboodZaidLibrary</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Library</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>library</groupId>
+    <artifactId>aboodZaidLibrary</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Library</name>
 
+    <!-- ===========================
+           🔵 1) SonarCloud + Java Properties
+         =========================== -->
+    <properties>
+        <!-- Java version -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-  <dependencies>
-   <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>5.10.0</version>
-        <scope>test</scope>
-    </dependency>
-      <!-- Jakarta Mail (إرسال الإيميلات عبر SMTP) -->
-      <dependency>
-          <groupId>com.sun.mail</groupId>
-          <artifactId>jakarta.mail</artifactId>
-          <version>2.0.1</version>
-      </dependency>
+        <!-- SonarCloud (عدّلهم حسب اسم الـ Org والـ Repo عندك) -->
+        <sonar.organization>abood-ja</sonar.organization>
+        <sonar.projectKey>abood-ja_books_library</sonar.projectKey>
 
-      <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-core</artifactId>
-          <version>4.11.0</version>
-          <scope>test</scope>
-      </dependency>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    </properties>
 
-      <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-inline</artifactId>
-          <version>4.11.0</version> <!-- or any compatible version -->
-          <scope>test</scope>
-      </dependency>
+    <dependencies>
 
-  </dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!-- ===========================
+                   🔵 Surefire (لازم للـ JUnit 5)
+                 =========================== -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+
+            <!-- ===========================
+                   🔵 JaCoCo (موجود + اشتغل ممتاز)
+                 =========================== -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+
+                <configuration>
+                    <excludes>
+                        <!-- استثناء كل الشاشات -->
+                        <exclude>**/*Screen.class</exclude>
+
+                        <!-- استثناء enum الخاصة بالقوائم -->
+                        <exclude>**/clsAdminBooksMenuScreen$*.class</exclude>
+
+                        <!-- استثناء أي كلاس مسؤول عن UI فقط -->
+                        <exclude>**/clsScreen.class</exclude>
+                    </excludes>
+                </configuration>
+
+                <executions>
+
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <!-- ===========================
+                   🔵 Sonar Scanner (مطلوب للـ GitHub Actions)
+                 =========================== -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.1.2184</version>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>

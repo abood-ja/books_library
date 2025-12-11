@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsManageUsersMenuScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsManageUsersMenuScreen.java</span></div><h1>clsManageUsersMenuScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+public class clsManageUsersMenuScreen extends clsScreen{
+    public static boolean TEST_MODE = false; // default false
+<span class="fc" id="L5">    public enum enManageUsersMenuOptions {</span>
+<span class="fc" id="L6">        eUsersList(1),</span>
+<span class="fc" id="L7">        eAddNewUser(2),</span>
+<span class="fc" id="L8">        eFindUser(3),</span>
+<span class="fc" id="L9">        eDeleteUser(4),</span>
+<span class="fc" id="L10">        eLoginRegisterScreen(5),</span>
+<span class="fc" id="L11">        eBackToMainMenu(6);</span>
+        private final int value;
+
+        // Constructor
+<span class="fc" id="L15">        enManageUsersMenuOptions(int value) {</span>
+<span class="fc" id="L16">            this.value = value;</span>
+<span class="fc" id="L17">        }</span>
+
+        // Getter
+        public int getValue() {
+<span class="fc" id="L21">            return value;</span>
+        }
+    }
+    private static enManageUsersMenuOptions _ReadManageUsersMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose what do you want to do? [1 to 6]? &quot;);
+
+        int choice = clsInputValidate.readIntNumberBetween(1, 6, &quot;Enter Number between 1 to 6? &quot;);
+
+
+        for (enManageUsersMenuOptions o : enManageUsersMenuOptions.values()) {
+            if (o.getValue() == choice) {
+                return o;
+            }
+        }
+
+
+        return null;
+    }
+    private static void _ShowUsersListScreen() {
+            clsUserListScreen.showUserListScreen();
+    }
+
+    private static void _ShowAddUsersListScreen() {clsAddUserScreen.showAddUserScreen();
+    }
+
+    private static void _ShowFindUsersListScreen() {
+
+            clsFindUserScreen.showFindUserScreen();
+
+    }
+
+    private static void _ShowDeleteUsersListScreen() {
+
+            clsDeleteUserScreen.showDeleteUserScreen();
+
+    }
+
+    private static void _ShowLoginRegisterScreen() {
+
+            clsLoginRegisterScreen.showLoginRegisterScreen();
+
+    }
+    private static void _GoBackToManageUsersMenu() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;\nPress any key to go back to Books Menu...&quot;);
+        new java.util.Scanner(System.in).nextLine();
+        showManageUsersMenu();
+    }
+    private static void _PerformManageUsersMenuOption(enManageUsersMenuOptions option) {
+        switch(option) {
+            case eUsersList:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowUsersListScreen();
+                _GoBackToManageUsersMenu();
+                break;
+            case eAddNewUser: // Example for your enum
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowAddUsersListScreen();
+                _GoBackToManageUsersMenu();
+                break;
+
+            case eFindUser:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowFindUsersListScreen();
+                _GoBackToManageUsersMenu();
+                break;
+
+            case eDeleteUser:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowDeleteUsersListScreen();
+                _GoBackToManageUsersMenu();
+                break;
+
+            case eLoginRegisterScreen:
+                System.out.print(&quot;\033[H\033[2J&quot;);
+                _ShowLoginRegisterScreen();
+                _GoBackToManageUsersMenu();
+                break;
+
+            case eBackToMainMenu:
+                break;
+        }
+    }
+    public static void showManageUsersMenu() {
+        if(!clsScreen.CheckAccessRights(clsUser.enPermissions.pManageUsers)){
+            return;
+        }
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        System.out.flush();
+        _DrawScreenHeader(&quot;\t\tMain Screen&quot;);
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t\t\tManage Users Menu&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] Users List .&quot;);
+        System.out.println(pad + &quot;\t[2] Add New User .&quot;);
+        System.out.println(pad + &quot;\t[3] Find User.&quot;);
+        System.out.println(pad + &quot;\t[4] Delete User.&quot;);
+        System.out.println(pad + &quot;\t[5] Login Records Screen.&quot;);
+        System.out.println(pad + &quot;\t[6] Main Menu.&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        _PerformManageUsersMenuOption(_ReadManageUsersMenuOption());
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

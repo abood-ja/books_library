@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsUserBooksMenuScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsUserBooksMenuScreen.java</span></div><h1>clsUserBooksMenuScreen.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.regex.Pattern;
+
+public class clsUserBooksMenuScreen extends clsScreen {
+
+    private static final String SEP = &quot;#//#&quot;;
+    private static final String BOOKS_FILE = &quot;Books.txt&quot;;
+    private static final String LOANS_FILE = &quot;Loans.txt&quot;;
+
+    private static void __ensureLoansFile() {
+        try {
+            Path p = Paths.get(LOANS_FILE);
+            if (Files.notExists(p)) Files.createFile(p);
+        } catch (IOException e) {
+            System.out.println(&quot;⚠️ Cannot create Loans file: &quot; + e.getMessage());
+        }
+    }
+
+    private static boolean __bookExistsByIsbn(String isbn) {
+        Path p = Paths.get(BOOKS_FILE);
+        if (!Files.exists(p)) return false;
+
+        try {
+            for (String line : Files.readAllLines(p)) {
+                if (line == null || line.trim().isEmpty()) continue;
+                String[] cols = line.split(Pattern.quote(SEP), -1);
+                for (String cell : cols)
+                    if (cell.trim().equalsIgnoreCase(isbn)) return true;
+            }
+        } catch (IOException e) {
+            System.out.println(&quot;⚠️ Error reading &quot; + BOOKS_FILE + &quot;: &quot; + e.getMessage());
+        }
+        return false;
+    }
+
+    private static boolean __isCurrentlyBorrowed(String isbn) {
+        Path f = Paths.get(LOANS_FILE);
+        if (!Files.exists(f)) return false;
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+                String[] p = line.split(Pattern.quote(SEP), -1);
+                if (p.length &gt;= 5) {
+                    boolean returned = Boolean.parseBoolean(p[4].trim());
+                    if (p[0].trim().equalsIgnoreCase(isbn) &amp;&amp; !returned) return true;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(&quot;⚠️ Error reading loans: &quot; + e.getMessage());
+        }
+        return false;
+    }
+
+    private static boolean __saveLoan(String isbn, String username, LocalDate borrow, LocalDate due) {
+        String line = String.join(SEP, isbn, username, borrow.toString(), due.toString(), &quot;false&quot;);
+
+        try (BufferedWriter w = Files.newBufferedWriter(Paths.get(LOANS_FILE), StandardOpenOption.APPEND)) {
+            w.write(line);
+            w.newLine();
+            return true;
+        } catch (IOException e) {
+            System.out.println(&quot;⚠️ Error saving loan: &quot; + e.getMessage());
+            return false;
+        }
+    }
+
+    private static void _ShowBorrowBookScreen() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        _DrawScreenHeader(&quot;\t\tBorrow Book&quot;);
+        __ensureLoansFile();
+
+        if (!clsUserSession.currentUser.canBorrow()) {
+            System.out.println(pad + &quot;❌ Borrowing blocked. Resolve issues first.&quot;);
+            return;
+        }
+
+        String username = clsUserSession.currentUser.getUserName().trim();
+        System.out.println(pad + &quot;Active user: &quot; + username);
+
+        Scanner sc = new Scanner(System.in);
+        System.out.print(pad + &quot;Enter ISBN to borrow: &quot;);
+        String isbn = sc.nextLine().trim();
+
+        if (isbn.isEmpty()) {
+            System.out.println(pad + &quot;❌ ISBN cannot be empty.&quot;);
+            return;
+        }
+
+        if (!__bookExistsByIsbn(isbn)) {
+            System.out.println(pad + &quot;❌ Book not found.&quot;);
+            return;
+        }
+
+        if (__isCurrentlyBorrowed(isbn)) {
+            System.out.println(pad + &quot;❌ Already borrowed.&quot;);
+            return;
+        }
+
+        LocalDate borrow = LocalDate.now();
+        LocalDate due = borrow.plusDays(28);
+
+        if (__saveLoan(isbn, username, borrow, due)) {
+            System.out.println(pad + &quot;✅ Borrowed successfully! Due: &quot; + due);
+        } else {
+            System.out.println(pad + &quot;⚠️ Could not save.&quot;);
+        }
+    }
+
+    private static void _ShowBooksListScreen() {
+        clsBooksListScreen.showBooksListScreen();
+    }
+
+    private static void _ShowFindBookScreen() {
+        clsFindBookScreen.showFindBookScreen();
+    }
+
+    private static void _ShowMyOverdueBooksScreen() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        _DrawScreenHeader(&quot;\t\tMy Overdue Books&quot;);
+
+        String username = clsUserSession.currentUser.getUserName().toLowerCase();
+        Path f = Paths.get(LOANS_FILE);
+        if (!Files.exists(f)) {
+            System.out.println(pad + &quot;No loans found.&quot;);
+            return;
+        }
+
+        LocalDate today = LocalDate.now();
+        boolean any = false;
+
+        try {
+            for (String line : Files.readAllLines(f)) {
+                if (line.trim().isEmpty()) continue;
+                String[] p = line.split(Pattern.quote(SEP));
+
+                if (p.length &gt;= 5) {
+                    String isbn = p[0].trim();
+                    String u = p[1].trim().toLowerCase();
+                    LocalDate due = LocalDate.parse(p[3].trim());
+                    boolean returned = Boolean.parseBoolean(p[4].trim());
+
+                    if (!returned &amp;&amp; u.equals(username) &amp;&amp; today.isAfter(due)) {
+                        long days = ChronoUnit.DAYS.between(due, today);
+                        System.out.println(pad + &quot;- ISBN: &quot; + isbn + &quot; | Overdue: &quot; + days + &quot; days&quot;);
+                        any = true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(&quot;⚠️ Error: &quot; + e.getMessage());
+        }
+
+        if (!any)
+            System.out.println(pad + &quot;You have no overdue items.&quot;);
+    }
+
+    private static void _ShowReturnBookScreen() {
+        _ShowReturnBookScreen();
+    }
+
+    // ===== Added Pay Fine Screen =====
+    private static void _ShowPayFineScreen() {
+        clsPayFineScreen.showPayFineScreen();
+    }
+
+<span class="fc" id="L174">    public enum enBooksMenuOptions {</span>
+<span class="fc" id="L175">        eBooksList(1),</span>
+<span class="fc" id="L176">        eBorrowBook(2),</span>
+<span class="fc" id="L177">        eFindBook(3),</span>
+<span class="fc" id="L178">        eBackToMainMenu(4),</span>
+<span class="fc" id="L179">        eMyOverdueBooks(5),</span>
+<span class="fc" id="L180">        eReturnBook(6);</span>
+
+        private final int value;
+<span class="fc" id="L183">        enBooksMenuOptions(int value) { this.value = value; }</span>
+<span class="fc" id="L184">        public int getValue() { return value; }</span>
+    }
+
+    private static enBooksMenuOptions _ReadBooksMenuOption() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;Choose what do you want to do? [1 to 7]? &quot;);
+
+        int choice = clsInputValidate.readIntNumberBetween(1, 7, &quot;Enter Number between 1 to 7? &quot;);
+
+        for (enBooksMenuOptions o : enBooksMenuOptions.values())
+            if (o.getValue() == choice) return o;
+
+        return enBooksMenuOptions.eBackToMainMenu;
+    }
+
+    private static void _GoBackToBooksMenu() {
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+        System.out.print(pad + &quot;\nPress any key to go back to Books Menu...&quot;);
+        new Scanner(System.in).nextLine();
+        showBooksMenu();
+    }
+
+    private static void _PerformBooksMenuOption(enBooksMenuOptions option) {
+        switch(option) {
+            case eBooksList:
+                _ShowBooksListScreen();
+                _GoBackToBooksMenu();
+                break;
+
+            case eBorrowBook:
+                _ShowBorrowBookScreen();
+                _GoBackToBooksMenu();
+                break;
+
+            case eFindBook:
+                _ShowFindBookScreen();
+                _GoBackToBooksMenu();
+                break;
+
+            case eMyOverdueBooks:
+                _ShowMyOverdueBooksScreen();
+                _GoBackToBooksMenu();
+                break;
+
+            case eReturnBook:
+                _ShowReturnBookScreen();
+                _GoBackToBooksMenu();
+                break;
+
+
+            case eBackToMainMenu:
+                break;
+        }
+    }
+
+    public static void showBooksMenu() {
+        System.out.print(&quot;\033[H\033[2J&quot;);
+        _DrawScreenHeader(&quot;\t\tMain Screen&quot;);
+
+        String pad = String.format(&quot;%37s&quot;, &quot;&quot;);
+
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t\t\tBooks Menu&quot;);
+        System.out.println(pad + &quot;===========================================&quot;);
+        System.out.println(pad + &quot;\t[1] Books List.&quot;);
+        System.out.println(pad + &quot;\t[2] Borrow Book.&quot;);
+        System.out.println(pad + &quot;\t[3] Find Book.&quot;);
+        System.out.println(pad + &quot;\t[4] Main Menu.&quot;);
+        System.out.println(pad + &quot;\t[5] My Overdue Books.&quot;);
+        System.out.println(pad + &quot;\t[6] Return Book.&quot;);
+
+        System.out.println(pad + &quot;===========================================&quot;);
+
+        _PerformBooksMenuOption(_ReadBooksMenuOption());
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

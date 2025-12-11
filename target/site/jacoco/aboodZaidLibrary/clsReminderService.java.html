@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsReminderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsReminderService.java</span></div><h1>clsReminderService.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.regex.Pattern;
+
+<span class="nc" id="L21">public class clsReminderService {</span>
+
+    // ===== ملفات النظام =====
+    private static final String SEP = &quot;#//#&quot;;
+    private static final String USERS_FILE = &quot;Users.txt&quot;;   // username#//#...#//#email#//#!...
+    private static final String LOANS_FILE = &quot;Loans.txt&quot;;   // isbn#//#username#//#borrow#//#due#//#returned
+
+    private static final String SMTP_HOST = &quot;smtp.gmail.com&quot;;
+    private static final int    SMTP_PORT = 587; // TLS
+    private static final String SMTP_USER = &quot;s12218431@stu.najah.edu&quot;; // &lt;-- عدّل
+    private static final String SMTP_PASS = &quot;kfomkyghpzhlrufs&quot;;      // &lt;-- عدّل (App Password)
+
+    // أثناء التطوير: اطبع بدل ما ترسل
+    private static final boolean DRY_RUN = false;
+
+    // ===== واجهة الاستدعاء من قائمة الأدمن =====
+    public static void sendOverdueRemindersNow() {
+<span class="fc" id="L38">        Map&lt;String, String&gt; userEmails = loadUserEmails();           // key = username (lowercase)</span>
+<span class="fc" id="L39">        Map&lt;String, List&lt;LoanRow&gt;&gt; overdueByUser = loadOverduesGroupedByUser(); // key = username (lowercase)</span>
+
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (overdueByUser.isEmpty()) {</span>
+<span class="fc" id="L42">            System.out.println(&quot;✅ No overdue items found. Nothing to send.&quot;);</span>
+<span class="fc" id="L43">            return;</span>
+        }
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        for (Map.Entry&lt;String, List&lt;LoanRow&gt;&gt; e : overdueByUser.entrySet()) {</span>
+<span class="fc" id="L47">            String usernameKey = e.getKey();                 // lowercase</span>
+<span class="fc" id="L48">            String to = userEmails.get(usernameKey);         // ابحث بنفس الـ key</span>
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">            if (to == null || to.trim().isEmpty()) {</span>
+<span class="fc" id="L50">                System.out.println(&quot;⚠️ No email for user: &quot; + usernameKey + &quot; (skipping)&quot;);</span>
+<span class="fc" id="L51">                continue;</span>
+            }
+
+            // للعرض الجميل في الإيميل: أول حرف كبير فقط (اختياري)
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            String displayName = usernameKey.isEmpty() ? &quot;User&quot;</span>
+<span class="fc" id="L56">                    : usernameKey.substring(0, 1).toUpperCase() + usernameKey.substring(1);</span>
+
+<span class="fc" id="L58">            String subject = &quot;Library Overdue Reminder&quot;;</span>
+<span class="fc" id="L59">            String body = buildEmailBody(displayName, e.getValue());</span>
+
+            try {
+                if (DRY_RUN) {
+                    System.out.println(&quot;----- DRY RUN -----&quot;);
+                    System.out.println(&quot;To: &quot; + to);
+                    System.out.println(&quot;Subject: &quot; + subject);
+                    System.out.println(body);
+                    System.out.println(&quot;-------------------&quot;);
+                } else {
+<span class="fc" id="L69">                    sendEmail(to, subject, body);</span>
+<span class="fc" id="L70">                    System.out.println(&quot;📧 Sent reminder to: &quot; + to);</span>
+                }
+<span class="nc" id="L72">            } catch (Exception ex) {</span>
+<span class="nc" id="L73">                System.out.println(&quot;❌ Failed to send to &quot; + to + &quot;: &quot; + ex.getMessage());</span>
+<span class="fc" id="L74">            }</span>
+<span class="fc" id="L75">        }</span>
+<span class="fc" id="L76">    }</span>
+
+    // ===== تحميل الإيميلات من Users.txt (بدون حساسية حالة) =====
+    private static Map&lt;String, String&gt; loadUserEmails() {
+<span class="fc" id="L80">        Map&lt;String, String&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L81">        Path f = Paths.get(USERS_FILE);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (!Files.exists(f)) return map;</span>
+
+        try {
+<span class="fc bfc" id="L85" title="All 2 branches covered.">            for (String line : Files.readAllLines(f)) {</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">                if (line.trim().isEmpty()) continue;</span>
+<span class="fc" id="L87">                String[] p = line.split(Pattern.quote(SEP), -1);</span>
+                // التنسيق الفعلي: firstName | lastName | email | phone | userName | encPass | permissions
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                if (p.length &gt;= 5) {</span>
+<span class="fc" id="L90">                    String email = p[2].trim();</span>
+<span class="fc" id="L91">                    String usernameKey = p[4].trim().toLowerCase();</span>
+<span class="pc bpc" id="L92" title="1 of 4 branches missed.">                    if (!usernameKey.isEmpty() &amp;&amp; email.contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L93">                        map.put(usernameKey, email);</span>
+                    }
+                }
+<span class="fc" id="L96">            }</span>
+<span class="nc" id="L97">        } catch (IOException e) {</span>
+<span class="nc" id="L98">            System.out.println(&quot;⚠️ Error reading &quot; + USERS_FILE + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L99">        }</span>
+<span class="fc" id="L100">        return map;</span>
+    }
+
+
+    // ===== تجميع القروض المتأخرة لكل مستخدم (بدون حساسية حالة + يتحمّل حقول زايدة) =====
+    private static Map&lt;String, List&lt;LoanRow&gt;&gt; loadOverduesGroupedByUser() {
+<span class="fc" id="L106">        Path f = Paths.get(LOANS_FILE);</span>
+<span class="fc" id="L107">        Map&lt;String, List&lt;LoanRow&gt;&gt; res = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (!Files.exists(f)) return res;</span>
+
+<span class="fc" id="L110">        LocalDate today = LocalDate.now();</span>
+        try {
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            for (String line : Files.readAllLines(f)) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                if (line.trim().isEmpty()) continue;</span>
+<span class="fc" id="L114">                String[] p = line.split(Pattern.quote(SEP), -1);</span>
+
+                // الصيغة الأساس: isbn#//#username#//#borrow#//#due#//#returned
+<span class="fc bfc" id="L117" title="All 2 branches covered.">                if (p.length &gt;= 5) {</span>
+<span class="fc" id="L118">                    String isbn = safeGet(p, 0).trim();</span>
+<span class="fc" id="L119">                    String usernameKey = safeGet(p, 1).trim().toLowerCase();</span>
+<span class="fc" id="L120">                    LocalDate due = LocalDate.parse(safeGet(p, 3).trim());</span>
+
+                    // آخر حقل هو returned حتى لو في حقول زيادة
+<span class="fc" id="L123">                    boolean returned = Boolean.parseBoolean(safeGet(p, p.length - 1).trim());</span>
+
+<span class="fc bfc" id="L125" title="All 4 branches covered.">                    if (!returned &amp;&amp; today.isAfter(due)) {</span>
+<span class="fc" id="L126">                        long overdueDays = ChronoUnit.DAYS.between(due, today);</span>
+<span class="fc" id="L127">                        res.computeIfAbsent(usernameKey, k -&gt; new ArrayList&lt;&gt;())</span>
+<span class="fc" id="L128">                                .add(new LoanRow(isbn, due, overdueDays));</span>
+                    }
+                }
+<span class="fc" id="L131">            }</span>
+<span class="nc" id="L132">        } catch (IOException e) {</span>
+<span class="nc" id="L133">            System.out.println(&quot;⚠️ Error reading &quot; + LOANS_FILE + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L134">        } catch (Exception e) {</span>
+<span class="nc" id="L135">            System.out.println(&quot;⚠️ Parse error in &quot; + LOANS_FILE + &quot;: &quot; + e.getMessage());</span>
+<span class="pc" id="L136">        }</span>
+<span class="fc" id="L137">        return res;</span>
+    }
+
+    private static String safeGet(String[] arr, int idx) {
+<span class="pc bpc" id="L141" title="2 of 4 branches missed.">        return (idx &gt;= 0 &amp;&amp; idx &lt; arr.length) ? arr[idx] : &quot;&quot;;</span>
+    }
+
+    private static String buildEmailBody(String usernameDisplay, List&lt;LoanRow&gt; rows) {
+<span class="fc" id="L145">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L146">        sb.append(&quot;Hello &quot;).append(usernameDisplay).append(&quot;,\n\n&quot;);</span>
+<span class="fc" id="L147">        sb.append(&quot;This is a friendly reminder from the Library.\n&quot;);</span>
+<span class="fc" id="L148">        sb.append(&quot;The following borrowed items are overdue:\n\n&quot;);</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        for (LoanRow r : rows) {</span>
+<span class="fc" id="L150">            sb.append(&quot;- ISBN: &quot;).append(r.isbn)</span>
+<span class="fc" id="L151">                    .append(&quot; | Due: &quot;).append(r.due)</span>
+<span class="fc" id="L152">                    .append(&quot; | Overdue: &quot;).append(r.days).append(&quot; day(s)\n&quot;);</span>
+<span class="fc" id="L153">        }</span>
+<span class="fc" id="L154">        sb.append(&quot;\nPlease return them as soon as possible. Thank you!\n&quot;);</span>
+<span class="fc" id="L155">        sb.append(&quot;\nRegards,\nLibrary Team&quot;);</span>
+<span class="fc" id="L156">        return sb.toString();</span>
+    }
+
+    // ===== الإرسال عبر SMTP =====
+    public static void sendEmail(String to, String subject, String body) throws MessagingException {
+<span class="fc" id="L161">        Properties props = new Properties();</span>
+<span class="fc" id="L162">        props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L163">        props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L164">        props.put(&quot;mail.smtp.host&quot;, SMTP_HOST);</span>
+<span class="fc" id="L165">        props.put(&quot;mail.smtp.port&quot;, Integer.toString(SMTP_PORT));</span>
+
+<span class="fc" id="L167">        Session session = Session.getInstance(props, new Authenticator() {</span>
+            protected PasswordAuthentication getPasswordAuthentication() {
+<span class="fc" id="L169">                return new PasswordAuthentication(SMTP_USER, SMTP_PASS);</span>
+            }
+        });
+
+<span class="fc" id="L173">        Message message = new MimeMessage(session);</span>
+<span class="fc" id="L174">        message.setFrom(new InternetAddress(SMTP_USER));</span>
+<span class="fc" id="L175">        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));</span>
+<span class="fc" id="L176">        message.setSubject(subject);</span>
+<span class="fc" id="L177">        message.setText(body);</span>
+
+<span class="fc" id="L179">        Transport.send(message);</span>
+<span class="fc" id="L180">    }</span>
+
+    // ===== نموذج سطر قرض =====
+    private static class LoanRow {
+        final String isbn;
+        final LocalDate due;
+        final long days;
+<span class="fc" id="L187">        LoanRow(String isbn, LocalDate due, long days) {</span>
+<span class="fc" id="L188">            this.isbn = isbn; this.due = due; this.days = days;</span>
+<span class="fc" id="L189">        }</span>
+    }
+    // ===== إرسال رسالة مخصصة لأي بريد (تُستخدم للترحيب وغيره) =====
+    public static void sendCustomEmail(String to, String subject, String body) {
+        if (DRY_RUN) { // في وضع التطوير: يطبع بدل الإرسال الحقيقي
+            System.out.println(&quot;----- DRY RUN (Custom Email) -----&quot;);
+            System.out.println(&quot;To: &quot; + to);
+            System.out.println(&quot;Subject: &quot; + subject);
+            System.out.println(&quot;Body:\n&quot; + body);
+            System.out.println(&quot;----------------------------------&quot;);
+            return;
+        }
+
+        try {
+<span class="fc" id="L203">            Properties props = new Properties();</span>
+<span class="fc" id="L204">            props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L205">            props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L206">            props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);</span>
+<span class="fc" id="L207">            props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);</span>
+
+<span class="fc" id="L209">            Session session = Session.getInstance(props, new Authenticator() {</span>
+                protected PasswordAuthentication getPasswordAuthentication() {
+<span class="fc" id="L211">                    return new PasswordAuthentication(SMTP_USER, SMTP_PASS);</span>
+                }
+            });
+
+<span class="fc" id="L215">            Message message = new MimeMessage(session);</span>
+<span class="fc" id="L216">            message.setFrom(new InternetAddress(SMTP_USER));</span>
+<span class="fc" id="L217">            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));</span>
+<span class="fc" id="L218">            message.setSubject(subject);</span>
+<span class="fc" id="L219">            message.setText(body);</span>
+
+<span class="fc" id="L221">            Transport.send(message);</span>
+
+<span class="fc" id="L223">            System.out.println(&quot;✅ Email sent successfully to &quot; + to);</span>
+<span class="fc" id="L224">        } catch (Exception e) {</span>
+<span class="fc" id="L225">            System.out.println(&quot;⚠️ Failed to send email: &quot; + e.getMessage());</span>
+<span class="fc" id="L226">        }</span>
+<span class="fc" id="L227">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

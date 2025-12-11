@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>clsCD.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Library</a> &gt; <a href="index.source.html" class="el_package">aboodZaidLibrary</a> &gt; <span class="el_source">clsCD.java</span></div><h1>clsCD.java</h1><pre class="source lang-java linenums">package aboodZaidLibrary;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Vector;
+
+public class clsCD {
+
+    private enMode _Mode;
+    private String _Title;
+    private String _Artist;
+    private String _CDID;
+<span class="fc" id="L13">    private boolean _MarkedForDelete = false;</span>
+
+<span class="fc" id="L15">    public enum enMode {</span>
+<span class="fc" id="L16">        EmptyMode(0),</span>
+<span class="fc" id="L17">        AddNewMode(1),</span>
+<span class="fc" id="L18">        UpdateMode(2);</span>
+
+        private final int value;
+
+<span class="fc" id="L22">        enMode(int value) { this.value = value; }</span>
+
+        public int getValue() {
+<span class="nc" id="L25">            return value;</span>
+        }
+    }
+
+    private static clsCD _GetEmptyCDObject() {
+<span class="fc" id="L30">        return new clsCD(enMode.EmptyMode, &quot;&quot;, &quot;&quot;, &quot;&quot;);</span>
+    }
+
+    // ====== Constructors ======
+<span class="fc" id="L34">    public clsCD(enMode mode, String title, String artist, String cdid) {</span>
+<span class="fc" id="L35">        _Mode = mode;</span>
+<span class="fc" id="L36">        _Title = title;</span>
+<span class="fc" id="L37">        _Artist = artist;</span>
+<span class="fc" id="L38">        _CDID = cdid;</span>
+<span class="fc" id="L39">    }</span>
+
+    // ====== File Operations ======
+    private static String _ConvertCDObjectToLine(clsCD cd) {
+<span class="fc" id="L43">        return cd._Title + &quot;#//#&quot; + cd._Artist + &quot;#//#&quot; + cd._CDID;</span>
+    }
+
+    private static clsCD _ConvertLineToCDObject(String line) {
+<span class="fc" id="L47">        Vector&lt;String&gt; vCDData = new Vector&lt;&gt;(Arrays.asList(line.split(&quot;#//#&quot;)));</span>
+<span class="fc" id="L48">        return new clsCD(enMode.UpdateMode, vCDData.get(0), vCDData.get(1), vCDData.get(2));</span>
+    }
+
+    private static Vector&lt;clsCD&gt; _LoadCDsDataFromFile() {
+<span class="fc" id="L52">        Vector&lt;clsCD&gt; vCDs = new Vector&lt;&gt;();</span>
+<span class="fc" id="L53">        String fileName = &quot;CDs.txt&quot;;</span>
+
+<span class="fc" id="L55">        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {</span>
+            String line;
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L59">                clsCD cd = _ConvertLineToCDObject(line);</span>
+<span class="fc" id="L60">                vCDs.add(cd);</span>
+<span class="fc" id="L61">            }</span>
+<span class="nc" id="L62">        } catch (IOException e) {</span>
+            // ملف غير موجود؟ عادي
+<span class="fc" id="L64">        }</span>
+
+<span class="fc" id="L66">        return vCDs;</span>
+    }
+
+    private static void _SaveCDsDataToFile(Vector&lt;clsCD&gt; vCDs) {
+<span class="fc" id="L70">        String fileName = &quot;CDs.txt&quot;;</span>
+
+<span class="fc" id="L72">        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            for (clsCD cd : vCDs) {</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">                if (!cd._MarkedForDelete) {</span>
+<span class="nc" id="L75">                    bw.write(_ConvertCDObjectToLine(cd));</span>
+<span class="nc" id="L76">                    bw.newLine();</span>
+                }
+<span class="fc" id="L78">            }</span>
+<span class="nc" id="L79">        } catch (IOException e) {</span>
+<span class="nc" id="L80">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L81">        }</span>
+<span class="fc" id="L82">    }</span>
+
+    private static void _AddDataLineToFile(String stDataLine) {
+<span class="fc" id="L85">        try (BufferedWriter bw = new BufferedWriter(new FileWriter(&quot;CDs.txt&quot;, true))) {</span>
+<span class="fc" id="L86">            bw.write(stDataLine);</span>
+<span class="fc" id="L87">            bw.newLine();</span>
+<span class="pc" id="L88">        } catch (IOException e) { }</span>
+<span class="fc" id="L89">    }</span>
+
+    private void _AddNew() {
+<span class="fc" id="L92">        _AddDataLineToFile(_ConvertCDObjectToLine(this));</span>
+<span class="fc" id="L93">    }</span>
+
+    // ====== Public Properties ======
+<span class="fc" id="L96">    public String getTitle() { return _Title; }</span>
+<span class="fc" id="L97">    public String getArtist() { return _Artist; }</span>
+<span class="fc" id="L98">    public String getCDID() { return _CDID; }</span>
+
+<span class="fc" id="L100">    public void setTitle(String title) { _Title = title; }</span>
+<span class="fc" id="L101">    public void setArtist(String artist) { _Artist = artist; }</span>
+<span class="fc" id="L102">    public void setCDID(String id) { _CDID = id; }</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    public boolean isEmpty() { return _Mode == enMode.EmptyMode; }</span>
+
+    public boolean delete() {
+<span class="fc" id="L107">        Vector&lt;clsCD&gt; vCDs = _LoadCDsDataFromFile();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        for (clsCD cd : vCDs) {</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">            if (cd._CDID.equals(this._CDID)) {</span>
+<span class="fc" id="L111">                cd._MarkedForDelete = true;</span>
+<span class="fc" id="L112">                break;</span>
+            }
+<span class="nc" id="L114">        }</span>
+
+<span class="fc" id="L116">        _SaveCDsDataToFile(vCDs);</span>
+
+<span class="fc" id="L118">        clsCD emptyCD = _GetEmptyCDObject();</span>
+<span class="fc" id="L119">        this._Mode = emptyCD._Mode;</span>
+<span class="fc" id="L120">        this._Title = emptyCD._Title;</span>
+<span class="fc" id="L121">        this._Artist = emptyCD._Artist;</span>
+<span class="fc" id="L122">        this._CDID = emptyCD._CDID;</span>
+
+<span class="fc" id="L124">        return true;</span>
+    }
+
+    // ====== Find ======
+    public static clsCD findCDByID(String id) {
+<span class="fc" id="L129">        Vector&lt;clsCD&gt; vCDs = _LoadCDsDataFromFile();</span>
+
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (clsCD cd : vCDs) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">            if (cd.getCDID().equals(id)) return cd;</span>
+<span class="fc" id="L133">        }</span>
+
+<span class="fc" id="L135">        return _GetEmptyCDObject();</span>
+    }
+
+    public static Vector&lt;clsCD&gt; findCDsByTitle(String title) {
+<span class="fc" id="L139">        Vector&lt;clsCD&gt; result = new Vector&lt;&gt;();</span>
+<span class="fc" id="L140">        Vector&lt;clsCD&gt; vCDs = _LoadCDsDataFromFile();</span>
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        for (clsCD cd : vCDs) {</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (cd.getTitle().equals(title)) result.add(cd);</span>
+<span class="fc" id="L144">        }</span>
+
+<span class="fc" id="L146">        return result;</span>
+    }
+
+    public static Vector&lt;clsCD&gt; findCDsByArtist(String artist) {
+<span class="fc" id="L150">        Vector&lt;clsCD&gt; result = new Vector&lt;&gt;();</span>
+<span class="fc" id="L151">        Vector&lt;clsCD&gt; vCDs = _LoadCDsDataFromFile();</span>
+
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        for (clsCD cd : vCDs) {</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">            if (cd.getArtist().equals(artist)) result.add(cd);</span>
+<span class="fc" id="L155">        }</span>
+
+<span class="fc" id="L157">        return result;</span>
+    }
+
+    public static boolean isCDExist(String id) {
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        return !findCDByID(id).isEmpty();</span>
+    }
+
+    public static clsCD GetAddNewCDObject(String id) {
+<span class="fc" id="L165">        return new clsCD(enMode.AddNewMode, &quot;&quot;, &quot;&quot;, id);</span>
+    }
+
+<span class="fc" id="L168">    public enum enSaveResults {</span>
+<span class="fc" id="L169">        svFailedEmptyObject,</span>
+<span class="fc" id="L170">        svSucceeded,</span>
+<span class="fc" id="L171">        svFailedCDExists</span>
+    }
+
+    public enSaveResults save() {
+<span class="pc bpc" id="L175" title="3 of 4 branches missed.">        switch (_Mode) {</span>
+
+            case EmptyMode:
+<span class="nc" id="L178">                return enSaveResults.svFailedEmptyObject;</span>
+
+            case UpdateMode:
+<span class="nc" id="L181">                return enSaveResults.svSucceeded;</span>
+
+            case AddNewMode:
+<span class="fc bfc" id="L184" title="All 2 branches covered.">                if (isCDExist(_CDID))</span>
+<span class="fc" id="L185">                    return enSaveResults.svFailedCDExists;</span>
+                else {
+<span class="fc" id="L187">                    _AddNew();</span>
+<span class="fc" id="L188">                    _Mode = enMode.UpdateMode;</span>
+<span class="fc" id="L189">                    return enSaveResults.svSucceeded;</span>
+                }
+        }
+<span class="nc" id="L192">        return enSaveResults.svFailedEmptyObject;</span>
+    }
+
+<span class="fc" id="L195">    public static Vector&lt;clsCD&gt; getCDsList() { return _LoadCDsDataFromFile(); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

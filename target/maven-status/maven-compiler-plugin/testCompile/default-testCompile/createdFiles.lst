@@ -6,6 +6,7 @@ aboodZaidLibrary\TestClsUser.class
 aboodZaidLibrary\TestClsDate.class
 aboodZaidLibrary\TestClsPayFineScreen.class
 aboodZaidLibrary\TestClsFindBookScreen.class
+aboodZaidLibrary\TestClsUserBooksMenuScreen.class
 aboodZaidLibrary\TestClsManageUsersMenuScreen.class
 aboodZaidLibrary\TestClsCD.class
 aboodZaidLibrary\TestClsUserListScreen.class
@@ -13,8 +14,10 @@ aboodZaidLibrary\TestClsAdminMainScreen.class
 aboodZaidLibrary\TestClsCDsListScreen.class
 aboodZaidLibrary\TestClsReminderService.class
 aboodZaidLibrary\TestClsDeleteCDScreen.class
+aboodZaidLibrary\TestClsLoginScreen.class
 aboodZaidLibrary\TestClsInputValidate.class
 aboodZaidLibrary\TestClsAdminBooksMenuScreen.class
+aboodZaidLibrary\TestClsUserCDsMenuScreen.class
 aboodZaidLibrary\TestClsAddNewCDScreen.class
 aboodZaidLibrary\TestClsEncryption.class
 aboodZaidLibrary\TestClsFindUserScreen.class
