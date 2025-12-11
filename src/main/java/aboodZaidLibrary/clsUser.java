@@ -400,7 +400,7 @@ public class clsUser extends clsPerson {
     // ====== Check if user can be deleted ======
     public boolean canBeDeleted() {
         String usernameKey = this.getUserName().trim().toLowerCase();
-        Path f = Paths.get("Loans.txt");
+        Path f = Paths.get(LOANS_FILE);
 
         // فحص الغرامات
         if (this.hasUnpaidFines()) {
